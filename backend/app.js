@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middlewares/error.middleware.js';
 import authRouter from './routes/auth.routes.js';
+import csurf from 'csurf';
 
 // Create and configure the Express app
 const app = express();
@@ -22,6 +23,17 @@ app.use(cookieParser());                            // Parse cookies from incomi
 app.use(morgan('tiny'));                            // Log HTTP requests using morgan's 'tiny' format
 app.use(cors(corsOptions));                         // Enable CORS using the specified options
 
+const isProd = process.env.NODE_ENV === 'production';
+const csrfProtection = csurf({
+    cookie: {
+        httpOnly: true,
+        sameSite: isProd ? 'none' : 'lax',
+        secure: isProd,
+    }
+});
+
+app.use(csrfProtection);
+
 app.use('/api/auth', authRouter);
 
 // Root route
@@ -33,6 +45,14 @@ app.get('/', (req, res) => {
 app.use((req, res, next) => {
     res.status(404);
     next(new Error('Not Found'));
+});
+
+// CSRF error handler
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).json({ success: false, message: 'Invalid CSRF token' });
+    }
+    next(err);
 });
 
 // Error handling middleware

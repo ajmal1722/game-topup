@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
-import { sendAuthToken } from "../utils/token.js";
+import { sendAuthPair, rotateRefreshToken, revokeRefreshToken, setAuthCookies, generateAccessToken } from "../utils/token.js";
 
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -16,7 +16,7 @@ export const register = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({ name, email, password });
-  return sendAuthToken(user, 201, res);
+  return sendAuthPair(user, 201, res, req.ip);
 });
 
 export const login = asyncHandler(async (req, res) => {
@@ -38,20 +38,37 @@ export const login = asyncHandler(async (req, res) => {
     throw new Error("Invalid credentials");
   }
 
-  return sendAuthToken(user, 200, res);
+  return sendAuthPair(user, 200, res, req.ip);
 });
 
 export const logout = asyncHandler(async (req, res) => {
-  res.cookie("token", "", {
-    httpOnly: true,
-    expires: new Date(0),
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
+  const rt = req.cookies?.rt;
+  if (rt) {
+    await revokeRefreshToken(rt, req.ip);
+  }
+  const isProd = process.env.NODE_ENV === "production";
+  res.cookie("token", "", { httpOnly: true, expires: new Date(0), sameSite: isProd ? "none" : "lax", secure: isProd });
+  res.cookie("rt", "", { httpOnly: true, expires: new Date(0), sameSite: isProd ? "none" : "lax", secure: isProd });
   res.status(200).json({ success: true });
 });
 
 export const me = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select("-password");
   res.status(200).json({ success: true, user });
+});
+
+export const refreshToken = asyncHandler(async (req, res) => {
+  const current = req.cookies?.rt;
+  if (!current) {
+    res.status(401);
+    throw new Error("No refresh token");
+  }
+  const rotated = await rotateRefreshToken(current, req.ip);
+  if (!rotated) {
+    res.status(401);
+    throw new Error("Invalid or expired refresh token");
+  }
+  const access = generateAccessToken(rotated.userId);
+  setAuthCookies(res, access, rotated.newValue);
+  res.status(200).json({ success: true, token: access });
 });
