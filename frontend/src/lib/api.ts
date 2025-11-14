@@ -1,6 +1,6 @@
 "use client";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:3000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
 let csrfToken: string | null = null;
 
@@ -16,16 +16,32 @@ async function getCsrfToken(): Promise<string> {
     return csrfToken!;
 }
 
+async function doFetch(path: string, init: RequestInit, retry = true) {
+    const res = await fetch(`${API_BASE}${path}`, { ...init, credentials: "include" });
+    if (res.status === 401 && retry) {
+        // try refresh
+        const token = await getCsrfToken();
+        const r = await fetch(`${API_BASE}/api/auth/refresh`, {
+            method: "POST",
+            headers: { "csrf-token": token },
+            credentials: "include",
+        });
+        if (r.ok) {
+            return doFetch(path, init, false);
+        }
+    }
+    return res;
+}
+
 export async function apiPost<T>(path: string, body: any): Promise<T> {
     const token = await getCsrfToken();
-    const res = await fetch(`${API_BASE}${path}`, {
+    const res = await doFetch(path, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "csrf-token": token,
         },
         body: JSON.stringify(body),
-        credentials: "include",
     });
     if (!res.ok) {
         let message = `Request failed (${res.status})`;
@@ -39,10 +55,12 @@ export async function apiPost<T>(path: string, body: any): Promise<T> {
 }
 
 export async function apiGet<T>(path: string): Promise<T> {
-    const res = await fetch(`${API_BASE}${path}`, {
-        method: "GET",
-        credentials: "include",
-    });
+    const res = await doFetch(path, { method: "GET" });
+    console.log(res);
     if (!res.ok) throw new Error(`Request failed (${res.status})`);
     return res.json();
+}
+
+export function clearCsrfCache() {
+    csrfToken = null;
 }
