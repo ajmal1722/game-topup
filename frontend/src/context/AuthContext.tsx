@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { authApi } from "@/services/authApi";
-import { clearCachedCsrf } from "@/lib/http";
+import { clearCachedCsrf } from "@/lib/api";
 
 export type AuthUser = {
     id: string;

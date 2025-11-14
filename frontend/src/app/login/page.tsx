@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
+import { isValidEmail, hasMinLength } from "@/utils/validation";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -13,8 +14,8 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [touched, setTouched] = useState<{ email?: boolean; password?: boolean }>({});
 
-    const emailValid = /.+@.+\..+/.test(email);
-    const passwordValid = password.length >= 6;
+    const emailValid = isValidEmail(email);
+    const passwordValid = hasMinLength(password, 6);
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

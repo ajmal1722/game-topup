@@ -1,66 +1,92 @@
 "use client";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 
-let csrfToken: string | null = null;
-
-async function getCsrfToken(): Promise<string> {
-    if (csrfToken) return csrfToken;
-    const res = await fetch(`${API_BASE}/api/auth/csrf`, {
-        method: "GET",
-        credentials: "include",
-    });
-    if (!res.ok) throw new Error("Failed to fetch CSRF token");
-    const data = await res.json();
-    csrfToken = data.csrfToken;
-    return csrfToken!;
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE || "").trim();
+if (!API_BASE_URL) {
+  if (typeof window !== "undefined") {
+    // Falling back to same-origin; ensure your Next.js dev proxy or deployment routes API under the same domain.
+    // Example: next.config.ts rewrites /api/* -> backend.
+    // eslint-disable-next-line no-console
+    console.warn("NEXT_PUBLIC_API_BASE is not set. Using same-origin for API calls.");
+  }
 }
 
-async function doFetch(path: string, init: RequestInit, retry = true) {
-    const res = await fetch(`${API_BASE}${path}`, { ...init, credentials: "include" });
-    if (res.status === 401 && retry) {
-        // try refresh
-        const token = await getCsrfToken();
-        const r = await fetch(`${API_BASE}/api/auth/refresh`, {
-            method: "POST",
-            headers: { "csrf-token": token },
-            credentials: "include",
+let cachedCsrfToken: string | null = null;
+
+async function fetchCsrfToken(): Promise<string> {
+  if (cachedCsrfToken) return cachedCsrfToken;
+  const res = await fetch(`${API_BASE_URL}/api/auth/csrf`, {
+    method: "GET",
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to fetch CSRF token");
+  const data = await res.json();
+  cachedCsrfToken = data.csrfToken;
+  return cachedCsrfToken!;
+}
+
+export function clearCachedCsrf() {
+  cachedCsrfToken = null;
+}
+
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL || undefined,
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
+});
+
+// Attach CSRF token to state-changing requests
+apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+  const method = (config.method || "get").toLowerCase();
+  const needsCsrf = ["post", "put", "patch", "delete"].includes(method);
+  if (needsCsrf) {
+    const token = await fetchCsrfToken();
+    config.headers = {
+      ...config.headers,
+      "csrf-token": token,
+    } as any;
+  }
+  return config;
+});
+
+let isRefreshing = false;
+let pendingQueue: Array<() => void> = [];
+
+function onRefreshed() {
+  pendingQueue.forEach((cb) => cb());
+  pendingQueue = [];
+}
+
+// Auto refresh on 401 once
+apiClient.interceptors.response.use(
+  (res: AxiosResponse) => res,
+  async (error: AxiosError) => {
+    const original = error.config as any;
+    if (error.response?.status === 401 && !original?._retry) {
+      if (isRefreshing) {
+        // queue the request until refresh finished
+        await new Promise<void>((resolve) => pendingQueue.push(resolve));
+        original._retry = true;
+        return apiClient(original);
+      }
+      try {
+        isRefreshing = true;
+        const token = await fetchCsrfToken();
+        await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+          method: "POST",
+          headers: { "csrf-token": token },
+          credentials: "include",
         });
-        if (r.ok) {
-            return doFetch(path, init, false);
-        }
+        onRefreshed();
+        original._retry = true;
+        return apiClient(original);
+      } catch (e) {
+        throw error;
+      } finally {
+        isRefreshing = false;
+      }
     }
-    return res;
-}
-
-export async function apiPost<T>(path: string, body: any): Promise<T> {
-    const token = await getCsrfToken();
-    const res = await doFetch(path, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "csrf-token": token,
-        },
-        body: JSON.stringify(body),
-    });
-    if (!res.ok) {
-        let message = `Request failed (${res.status})`;
-        try {
-            const j = await res.json();
-            message = j.message || j.error || message;
-        } catch { }
-        throw new Error(message);
-    }
-    return res.json();
-}
-
-export async function apiGet<T>(path: string): Promise<T> {
-    const res = await doFetch(path, { method: "GET" });
-    console.log(res);
-    if (!res.ok) throw new Error(`Request failed (${res.status})`);
-    return res.json();
-}
-
-export function clearCsrfCache() {
-    csrfToken = null;
-}
+    throw error;
+  }
+);
