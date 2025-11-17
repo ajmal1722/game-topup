@@ -1,7 +1,16 @@
 @import "tailwindcss";
 
+/* Theme tokens */
 @theme {
     --color-primary: #3b82f6;
     --color-secondary: #8b5cf6;
     --color-tertiary: #22c55e;
+
+    /* Neon gradient token */
+    --gradient-neon: linear-gradient(135deg, #00D9FF, #C084F5, #FF006E);
+}
+
+/* Custom utility class */
+@utility bg-gradient-neon {
+    background-image: var(--gradient-neon);
 }

@@ -1,9 +1,9 @@
-import React from 'react'
+import GameCarousal from "@/components/user/homePage/GameCarousal";
 
 const page = () => {
     return (
-        <div>
-            Welocme to Game Topup
+        <div className=''>
+            <GameCarousal />
         </div>
     )
 }
