@@ -1,6 +1,12 @@
 
 import { type IconType } from "react-icons";
-import { FaHome as Home, FaUsers as Users, FaFileAlt as FileText, FaCog as Settings } from "react-icons/fa";
+import { 
+    FaHome, 
+    FaUsers, 
+    FaGamepad, 
+    FaCogs 
+} from "react-icons/fa";
+import { MdPayment, MdHistory } from "react-icons/md";
 import { TbMailSearch } from "react-icons/tb";
 
 export type NavOption = {
@@ -40,10 +46,41 @@ export const navOptions: NavOption[] = [
     },
 ];
 
-export const adminNavOptions: AdminNavOption[] = [
-    { label: "Dashboard", to: "/admin", icon: Home, end: true },
-    { label: "Team", to: "/admin/team", icon: Users },
-    { label: "Inquiries", to: "/admin/inquiries", icon: TbMailSearch },
-    { label: "Blog", to: "/admin/blog", icon: FileText },
-    { label: "Settings", to: "/admin/settings", icon: Settings },
+export const adminNavOptions = [
+    {
+        label: "Dashboard",
+        to: "/admin",
+        icon: FaHome,
+        end: true,
+    },
+    {
+        label: "Users",
+        to: "/admin/users",
+        icon: FaUsers,
+    },
+    {
+        label: "Orders",
+        to: "/admin/orders",
+        icon: TbMailSearch,
+    },
+    {
+        label: "Games & Pricing",
+        to: "/admin/games",
+        icon: FaGamepad,
+    },
+    {
+        label: "Payments",
+        to: "/admin/payments",
+        icon: MdPayment,
+    },
+    {
+        label: "Activity Logs",
+        to: "/admin/logs",
+        icon: MdHistory,
+    },
+    {
+        label: "Settings",
+        to: "/admin/settings",
+        icon: FaCogs,
+    },
 ];
