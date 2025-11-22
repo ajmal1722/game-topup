@@ -4,12 +4,55 @@ import slugify from "slugify";
 import { uploadBufferToCloudinary } from "../utils/uploadToCloudinary.js";
 
 const getGames = asyncHandler(async (req, res) => {
-    try {
-        const games = await Game.find();
-        res.status(200).json(games);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    // 1. Query parameters
+    const {
+        search = "",
+        status,
+        page = 1,
+        limit = 20,
+        sort = "createdAt",
+        order = "desc"
+    } = req.query;
+
+    const query = {};
+
+    // 2. Search by name or description
+    if (search) {
+        query.$or = [
+            { name: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } }
+        ];
     }
+
+    // 3. Filter by status (active/inactive)
+    if (status && ["active", "inactive"].includes(status)) {
+        query.status = status;
+    }
+    // 4. Pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // 5. Sorting
+    const sortQuery = {
+        [sort]: order === "asc" ? 1 : -1,
+    };
+
+    // 6. Fetch Games
+    const games = await Game.find(query)
+        .sort(sortQuery)
+        .skip(skip)
+        .limit(parseInt(limit));
+
+    const total = await Game.countDocuments(query);
+
+    // 7. Send Response
+    return res.status(200).json({
+        success: true,
+        total,
+        page: Number(page),
+        totalPages: Math.ceil(total / limit),
+        count: games.length,
+        data: games,
+    });
 });
 
 // @desc    Create a new game
