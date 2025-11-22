@@ -330,12 +330,34 @@ const updateGame = asyncHandler(async (req, res) => {
 });
 
 const deleteGame = asyncHandler(async (req, res) => {
-    try {
-        const game = await Game.findByIdAndDelete(req.params.id);
-        res.status(200).json(game);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    const { id } = req.params;
+
+    // 1. Check if game exists
+    const game = await Game.findById(id);
+
+    if (!game) {
+        return res.status(404).json({
+            success: false,
+            message: "Game not found",
+        });
     }
+
+    // 2. Delete Cloudinary image if exists
+    if (game.imagePublicId) {
+        try {
+            await cloudinary.uploader.destroy(game.imagePublicId);
+        } catch (error) {
+            console.error("Cloudinary image deletion error:", error);
+        }
+    }
+
+    // 3. Delete Game Document
+    await Game.findByIdAndDelete(id);
+
+    return res.status(200).json({
+        success: true,
+        message: "Game deleted successfully",
+    });
 });
 
 export {
