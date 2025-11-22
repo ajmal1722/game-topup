@@ -18,9 +18,7 @@ const getGames = asyncHandler(async (req, res) => {
 const createGame = asyncHandler(async (req, res) => {
     const { name, description, status } = req.body;
 
-    // -------------------------------
     // 1. Parse & Validate requiredFields
-    // -------------------------------
     let requiredFields = req.body.requiredFields;
 
     if (typeof requiredFields === "string") {
@@ -80,9 +78,7 @@ const createGame = asyncHandler(async (req, res) => {
         }
     }
 
-    // --------------------------------
     // 2. Basic Validations
-    // --------------------------------
     if (!name || name.trim().length < 2) {
         return res.status(400).json({
             success: false,
@@ -102,9 +98,7 @@ const createGame = asyncHandler(async (req, res) => {
         });
     }
 
-    // --------------------------------
     // 3. Slug & Duplicate Check
-    // --------------------------------
     const slug = slugify(name, { lower: true, strict: true });
     const existing = await Game.findOne({ slug });
 
@@ -115,9 +109,7 @@ const createGame = asyncHandler(async (req, res) => {
         });
     }
 
-    // --------------------------------
     // 4. Upload Image
-    // --------------------------------
     let uploadedImageUrl = null;
     let uploadedImagePublicId = null;
 
@@ -133,9 +125,7 @@ const createGame = asyncHandler(async (req, res) => {
         });
     }
 
-    // --------------------------------
     // 5. Create Game
-    // --------------------------------
     let newGame;
 
     try {
@@ -165,14 +155,135 @@ const createGame = asyncHandler(async (req, res) => {
 });
 
 const updateGame = asyncHandler(async (req, res) => {
-    try {
-        const game = await Game.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
+    const { name, description, status } = req.body;
+
+    // 1. Fetch existing game
+    const game = await Game.findById(req.params.id);
+    if (!game) {
+        return res.status(404).json({
+            success: false,
+            message: "Game not found",
         });
-        res.status(200).json(game);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
     }
+
+    // 2. Parse requiredFields (form-data support)
+    let requiredFields = req.body.requiredFields;
+
+    if (typeof requiredFields === "string") {
+        try {
+            requiredFields = JSON.parse(requiredFields);
+        } catch {
+            return res.status(400).json({
+                success: false,
+                message: "requiredFields must be valid JSON",
+            });
+        }
+    }
+
+    // 3. Validate requiredFields if provided
+    if (requiredFields) {
+        if (!Array.isArray(requiredFields)) {
+            return res.status(400).json({
+                success: false,
+                message: "requiredFields must be an array",
+            });
+        }
+
+        const allowedTypes = ["text", "number", "email", "dropdown"];
+        const fieldKeySet = new Set();
+
+        for (const field of requiredFields) {
+            if (!field.fieldName || !field.fieldKey) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Each required field must have fieldName and fieldKey",
+                });
+            }
+
+            if (!allowedTypes.includes(field.fieldType)) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Invalid fieldType '${field.fieldType}'. Allowed: ${allowedTypes.join(", ")}`
+                });
+            }
+
+            if (field.fieldType === "dropdown" && (!field.options || field.options.length === 0)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Dropdown fields must have non-empty 'options'"
+                });
+            }
+
+            if (fieldKeySet.has(field.fieldKey)) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Duplicate fieldKey '${field.fieldKey}' found`,
+                });
+            }
+            fieldKeySet.add(field.fieldKey);
+        }
+    }
+
+    // 4. If name changed, regenerate slug
+    let updatedSlug = game.slug;
+
+    if (name && name.trim() !== game.name) {
+        updatedSlug = slugify(name, { lower: true, strict: true });
+
+        const slugExists = await Game.findOne({ slug: updatedSlug, _id: { $ne: game._id } });
+        if (slugExists) {
+            return res.status(409).json({
+                success: false,
+                message: "Another game already exists with this name",
+            });
+        }
+    }
+
+    // 5. Image update handling (optional)
+    let updatedImageUrl = game.imageUrl;
+    let updatedImagePublicId = game.imagePublicId;
+
+    if (req.file) {
+        // Validate image type
+        if (!["image/jpeg", "image/png", "image/webp"].includes(req.file.mimetype)) {
+            return res.status(400).json({
+                success: false,
+                message: "Only JPG, PNG and WEBP images are allowed",
+            });
+        }
+
+        // Upload new image
+        const uploadResult = await uploadBufferToCloudinary(req.file.buffer, "games");
+        updatedImageUrl = uploadResult.secure_url;
+        updatedImagePublicId = uploadResult.public_id;
+
+        // Delete old image if exists
+        if (game.imagePublicId) {
+            await deleteImageFromCloudinary(game.imagePublicId);
+        }
+    }
+
+    // 6. Apply updates
+    game.name = name ?? game.name;
+    game.slug = updatedSlug;
+    game.description = description ?? game.description;
+    game.status = status ?? game.status;
+
+    if (requiredFields) {
+        game.requiredFields = requiredFields;
+    }
+
+    game.imageUrl = updatedImageUrl;
+    game.imagePublicId = updatedImagePublicId;
+
+    // 7. Save Game
+    const updatedGame = await game.save();
+
+    return res.status(200).json({
+        success: true,
+        message: "Game updated successfully",
+        data: updatedGame,
+    });
 });
 
 const deleteGame = asyncHandler(async (req, res) => {
