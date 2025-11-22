@@ -44,7 +44,7 @@ const gameSchema = new mongoose.Schema(
             trim: true,
         },
 
-        logo: {
+        image: {
             type: String,
             required: false,
             default: null,
