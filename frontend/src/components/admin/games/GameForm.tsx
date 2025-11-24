@@ -5,6 +5,8 @@ import { Game } from "@/lib/types/game";
 import ImageUploader from "./ImageUploader";
 import RequiredFieldsBuilder from "./RequiredFieldsBuilder";
 import StatusToggle from "./StatusToggle";
+import Input from "@/components/form/Input";
+import Textarea from "@/components/form/TextArea";
 
 interface Props {
     gameId: string | "new";
@@ -50,38 +52,19 @@ export default function GameForm({ gameId }: Props) {
 
             {/* Name */}
             <div>
-                <label className="font-medium">Game Name</label>
-                <input
-                    className="border p-2 rounded w-full"
-                    value={form.name}
-                    onChange={(e) =>
-                        setForm({ ...form, name: e.target.value })
-                    }
-                />
-            </div>
-
-            {/* Slug */}
-            <div>
-                <label className="font-medium">Slug</label>
-                <input
-                    className="border p-2 rounded w-full"
-                    value={form.slug}
-                    onChange={(e) =>
-                        setForm({ ...form, slug: e.target.value })
-                    }
+                <Input 
+                    label="Game Name"
+                    placeholder="Enter game name"
+                    required
                 />
             </div>
 
             {/* Description */}
             <div>
-                <label className="font-medium">Description</label>
-                <textarea
-                    className="border p-2 rounded w-full"
-                    rows={3}
-                    value={form.description}
-                    onChange={(e) =>
-                        setForm({ ...form, description: e.target.value })
-                    }
+                <Textarea
+                    label="Description"
+                    placeholder="Enter description"
+                    required
                 />
             </div>
 

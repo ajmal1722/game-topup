@@ -2,6 +2,9 @@
 
 import { RequiredField } from "@/lib/types/game";
 import { IoTrash } from "react-icons/io5";
+import Input from "@/components/form/Input";
+import Select from "@/components/form/Select";
+import Textarea from "@/components/form/TextArea";
 
 interface Props {
     fields: RequiredField[];
@@ -41,8 +44,8 @@ export default function RequiredFieldsBuilder({ fields, onChange }: Props) {
                 <div key={i} className="p-4 border rounded-xl bg-gray-50">
                     {/* Row 1 */}
                     <div className="grid grid-cols-2 gap-4 mb-3">
-                        <input
-                            className="border p-2 rounded"
+                        <Input
+                            label="Field Name"
                             placeholder="Field Name"
                             value={field.fieldName}
                             onChange={(e) =>
@@ -50,8 +53,8 @@ export default function RequiredFieldsBuilder({ fields, onChange }: Props) {
                             }
                         />
 
-                        <input
-                            className="border p-2 rounded"
+                        <Input
+                            label="Field Key"
                             placeholder="field_key"
                             value={field.fieldKey}
                             onChange={(e) =>
@@ -62,23 +65,18 @@ export default function RequiredFieldsBuilder({ fields, onChange }: Props) {
 
                     {/* Row 2 */}
                     <div className="grid grid-cols-2 gap-4 mb-3">
-                        <select
-                            className="border p-2 rounded"
-                            value={field.fieldType}
-                            onChange={(e) =>
-                                updateField(i, {
-                                    fieldType: e.target.value as RequiredField["fieldType"],
-                                })
-                            }
-                        >
-                            <option value="text">Text</option>
-                            <option value="number">Number</option>
-                            <option value="email">Email</option>
-                            <option value="dropdown">Dropdown</option>
-                        </select>
+                        <Select
+                            label="Game Category"
+                            required
+                            options={[
+                                { label: "Sports", value: "sports" },
+                                { label: "Action", value: "action" },
+                                { label: "RPG", value: "rpg" },
+                            ]}
+                        />
 
-                        <input
-                            className="border p-2 rounded"
+                        <Input
+                            label="Placeholder"
                             placeholder="Placeholder"
                             value={field.placeholder}
                             onChange={(e) =>
