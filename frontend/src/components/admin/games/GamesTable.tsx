@@ -1,38 +1,68 @@
 "use client";
 
+import Image from "next/image";
 import { TbPencil, TbTrash, TbToggleLeft, TbToggleRight } from "react-icons/tb";
 import DataTable, { Column } from "@/components/admin/shared/DataTable";
 
-export type GameRow = {
-    game: string;
-    denom: string;
-    price: string;
-    active: boolean;
-};
+export interface GameData {
+    _id: string;
+    name: string;
+    slug: string;
+    imageUrl: string;
+    imagePublicId: string;
+    description: string;
+    requiredFields: {
+        fieldName: string;
+        fieldKey: string;
+        fieldType: string;
+        placeholder: string;
+        options: string[];
+        required: boolean;
+    }[];
+    status: string; // "active" | "inactive"
+}
 
 interface Props {
-    items: GameRow[];
-    onEdit?: (index: number, item: GameRow) => void;
-    onDelete?: (index: number, item: GameRow) => void;
-    onToggle?: (index: number, item: GameRow) => void;
+    items: GameData[];
+    onEdit?: (index: number, item: GameData) => void;
+    onDelete?: (index: number, item: GameData) => void;
+    onToggle?: (index: number, item: GameData) => void;
 }
 
 export default function GamesTable({ items, onEdit, onDelete, onToggle }: Props) {
-    const columns: Column<GameRow>[] = [
+    const columns: Column<GameData>[] = [
         {
             id: "game",
             header: "Game",
-            cell: (row) => <span className="font-medium">{row.game}</span>,
+            cell: (row) => (
+                <div className="flex items-center gap-3">
+                    {row.imageUrl ? (
+                        <Image
+                            src={row.imageUrl}
+                            alt={row.name}
+                            width={40}
+                            height={40}
+                            className="rounded-md object-cover"
+                        />
+                    ) : (
+                        <div className="w-10 h-10 bg-gray-200 rounded-md" />
+                    )}
+
+                    <div>
+                        <p className="font-medium">{row.name}</p>
+                        <span className="text-xs text-gray-500">{row.slug}</span>
+                    </div>
+                </div>
+            ),
         },
         {
-            id: "denom",
-            header: "Denomination",
-            cell: (row) => row.denom,
-        },
-        {
-            id: "price",
-            header: "Price",
-            cell: (row) => row.price,
+            id: "required",
+            header: "Required Fields",
+            cell: (row) => (
+                <span className="text-gray-700">
+                    {row.requiredFields?.length || 0} fields
+                </span>
+            ),
         },
         {
             id: "status",
@@ -44,7 +74,7 @@ export default function GamesTable({ items, onEdit, onDelete, onToggle }: Props)
                     disabled={typeof onToggle !== "function"}
                     title="Toggle status"
                 >
-                    {row.active ? (
+                    {row.status === "active" ? (
                         <>
                             <TbToggleRight size={22} /> Active
                         </>
@@ -64,7 +94,7 @@ export default function GamesTable({ items, onEdit, onDelete, onToggle }: Props)
             cell: (row, idx) => (
                 <div className="flex items-center justify-end gap-3">
                     <button
-                        className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-md text-gray-700 hover:bg-gray-100 transition"
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-md border text-gray-700 hover:bg-gray-100 transition"
                         onClick={() => onEdit?.(idx, row)}
                         disabled={typeof onEdit !== "function"}
                     >
