@@ -1,10 +1,14 @@
 // Centralized API configuration and endpoints
 
-export const API_BASE =
-    process.env.NEXT_PUBLIC_API_BASE ||
-    (typeof window !== "undefined"
-        ? `${window.location.origin}`
-        : "");
+export function getApiBase(fallbackOrigin?: string) {
+    const base =
+        (process.env.NEXT_PUBLIC_API_BASE || "").trim() ||
+        (fallbackOrigin ? fallbackOrigin.trim() : "") ||
+        (typeof window !== "undefined" ? window.location.origin : "");
+    return base.replace(/\/$/, "");
+}
+
+export const API_BASE = getApiBase();
 
 export const endpoints = {
     games: {
@@ -15,4 +19,4 @@ export const endpoints = {
 };
 
 export const apiUrl = (path: string) =>
-    `${API_BASE?.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+    `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;

@@ -1,8 +1,9 @@
 "use client";
 
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import { getApiBase } from "@/config/api";
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE || "").trim();
+const API_BASE_URL = getApiBase();
 if (!API_BASE_URL) {
   if (typeof window !== "undefined") {
     // Falling back to same-origin; ensure your Next.js dev proxy or deployment routes API under the same domain.
@@ -31,10 +32,13 @@ export function clearCachedCsrf() {
 }
 
 export const apiClient = axios.create({
-  baseURL: API_BASE_URL || undefined,
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
+
+// Ensure cookies are always sent
+apiClient.defaults.withCredentials = true;
 
 // Attach CSRF token to state-changing requests
 apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
