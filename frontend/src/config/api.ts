@@ -1,0 +1,22 @@
+// Centralized API configuration and endpoints
+
+export function getApiBase(fallbackOrigin?: string) {
+    const base =
+        (process.env.NEXT_PUBLIC_API_BASE || "").trim() ||
+        (fallbackOrigin ? fallbackOrigin.trim() : "") ||
+        (typeof window !== "undefined" ? window.location.origin : "");
+    return base.replace(/\/$/, "");
+}
+
+export const API_BASE = getApiBase();
+
+export const endpoints = {
+    games: {
+        root: "/api/games",
+        byId: (id: string) => `/api/games/${id}`,
+    },
+    // add more domains here (products, orders, users, etc.)
+};
+
+export const apiUrl = (path: string) =>
+    `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;

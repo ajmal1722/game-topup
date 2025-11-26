@@ -1,0 +1,95 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Game } from "@/lib/types/game";
+import ImageUploader from "./ImageUploader";
+import RequiredFieldsBuilder from "./RequiredFieldsBuilder";
+import StatusToggle from "./StatusToggle";
+import Input from "@/components/form/Input";
+import Textarea from "@/components/form/TextArea";
+import SubmitButton from "@/components/ui/SubmitButton";
+
+interface Props {
+    gameId: string | "new";
+}
+
+export default function GameForm({ gameId }: Props) {
+    const isEdit = gameId !== "new";
+    console.log('Game Id: ', gameId)
+
+    const [form, setForm] = useState<Game>({
+        name: "",
+        slug: "",
+        description: "",
+        imageUrl: null,
+        status: "active",
+        requiredFields: [],
+    });
+
+    const [file, setFile] = useState<File | null>(null);
+
+    // Load game when editing
+    useEffect(() => {
+        if (isEdit) {
+            fetch(`/api/games/${gameId}`)
+                .then((res) => res.json())
+                .then((data) => setForm(data));
+        }
+    }, [isEdit, gameId]);
+
+    return (
+        <div className="p-6 max-w-4xl mx-auto space-y-6">
+            <h1 className="text-2xl font-semibold">
+                {isEdit ? "Update Game" : "Create Game"}
+            </h1>
+
+            {/* IMAGE */}
+            <ImageUploader
+                imageUrl={form.imageUrl || null}
+                onChange={(file, preview) => {
+                    setFile(file);
+                    setForm({ ...form, imageUrl: preview });
+                }}
+            />
+
+            {/* Name */}
+            <div>
+                <Input 
+                    label="Game Name"
+                    placeholder="Enter game name"
+                    required
+                />
+            </div>
+
+            {/* Description */}
+            <div>
+                <Textarea
+                    label="Description"
+                    placeholder="Enter description"
+                    required
+                />
+            </div>
+
+            {/* Status */}
+            <div>
+                <label className="font-medium">Status</label>
+                <StatusToggle
+                    value={form.status}
+                    onChange={(status) => setForm({ ...form, status })}
+                />
+            </div>
+
+            {/* Required Fields */}
+            <RequiredFieldsBuilder
+                fields={form.requiredFields}
+                onChange={(fields) =>
+                    setForm({ ...form, requiredFields: fields })
+                }
+            />
+
+            <SubmitButton 
+                label={isEdit ? "Update Game" : "Create Game"}
+            />
+        </div>
+    );
+}

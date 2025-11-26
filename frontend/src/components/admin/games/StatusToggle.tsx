@@ -1,30 +1,22 @@
 "use client";
+import { useState } from "react";
 
-import { motion } from "framer-motion";
+interface Props {
+    value: "active" | "inactive";
+    onChange: (val: "active" | "inactive") => void;
+}
 
-interface StatusToggleProps {
-    defaultStatus: boolean;
-    onChange: (value: boolean) => void;
-};
-
-function StatusToggle({ defaultStatus, onChange }: StatusToggleProps) {
+export default function StatusToggle({ value, onChange }: Props) {
     return (
         <div
-            onClick={() => onChange(!defaultStatus)}
-            className={`w-12 h-6 flex items-center rounded-full cursor-pointer transition 
-                ${defaultStatus ? "bg-green-600" : "bg-gray-400"}
-            `}
+            onClick={() => onChange(value === "active" ? "inactive" : "active")}
+            className={`w-14 h-7 flex items-center rounded-full cursor-pointer transition
+                ${value === "active" ? "bg-green-500" : "bg-gray-400"}`}
         >
-            <motion.div
-                layout
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                className="w-5 h-5 bg-white rounded-full shadow ml-1"
-                animate={{
-                    x: defaultStatus ? 24 : 0,
-                }}
+            <div
+                className={`w-6 h-6 bg-white rounded-full shadow transform transition
+                    ${value === "active" ? "translate-x-7" : "translate-x-1"}`}
             />
         </div>
     );
 }
-
-export default StatusToggle;
