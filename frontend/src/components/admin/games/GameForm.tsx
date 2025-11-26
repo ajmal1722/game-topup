@@ -7,6 +7,7 @@ import RequiredFieldsBuilder from "./RequiredFieldsBuilder";
 import StatusToggle from "./StatusToggle";
 import Input from "@/components/form/Input";
 import Textarea from "@/components/form/TextArea";
+import SubmitButton from "@/components/ui/SubmitButton";
 
 interface Props {
     gameId: string | "new";
@@ -14,6 +15,7 @@ interface Props {
 
 export default function GameForm({ gameId }: Props) {
     const isEdit = gameId !== "new";
+    console.log('Game Id: ', gameId)
 
     const [form, setForm] = useState<Game>({
         name: "",
@@ -85,9 +87,9 @@ export default function GameForm({ gameId }: Props) {
                 }
             />
 
-            <button className="px-5 py-3 bg-black text-white rounded-lg text-sm">
-                {isEdit ? "Update Game" : "Create Game"}
-            </button>
+            <SubmitButton 
+                label={isEdit ? "Update Game" : "Create Game"}
+            />
         </div>
     );
 }

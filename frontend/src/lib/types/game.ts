@@ -8,14 +8,14 @@ export type RequiredField = {
 };
 
 export type Game = {
-    _id: string;
+    _id?: string;
     name: string;
     slug: string;
     imageUrl: string | null;
-    imagePublicId: string | null;
+    imagePublicId?: string | null;
     description: string;
     requiredFields: RequiredField[];
-    status: "active" | "inactive" | string;
+    status: "active" | "inactive";
 };
 
 export type GamesListResponse = {
