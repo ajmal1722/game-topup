@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Game, ApiResponse } from "@/lib/types/game";
+import { Game } from "@/lib/types/game";
 import { GamePayload } from "@/services/games/types";
 import ImageUploader from "./ImageUploader";
 import RequiredFieldsBuilder from "./RequiredFieldsBuilder";
@@ -59,7 +59,6 @@ export default function GameForm({ gameId }: Props) {
         try {
             const payload: GamePayload = {
                 name: form.name,
-                slug: form.slug,
                 description: form.description,
                 status: form.status,
                 requiredFields: form.requiredFields,
@@ -104,16 +103,6 @@ export default function GameForm({ gameId }: Props) {
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
-            </div>
-
-            {/* Slug */}
-            <div>
-                <Input
-                    label="Slug"
-                    placeholder="game-slug"
-                    value={form.slug}
-                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
                 />
             </div>
 

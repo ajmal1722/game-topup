@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Game } from "@/lib/types/game";
 import { gamesApiClient } from "@/services/games";
+import { toast } from 'react-toastify'
 import GamesToolbar from "@/components/admin/games/GamesToolbar";
 import SearchBox from "@/components/admin/shared/SearchBox";
 import GamesTable from "@/components/admin/games/GamesTable";
@@ -36,22 +37,22 @@ const AdminGamePage = ({ initialItems }: { initialItems: Game[] }) => {
             await gamesApiClient.remove(item._id);
 
             setItems(prev => prev.filter((_, i) => i !== index));
-            // toast.success("Game deleted");
+            toast.success("Game deleted");
         } catch {
-            // toast.error("Failed to delete game");
+            toast.error("Failed to delete game");
         }
     };
 
     /** TOGGLE STATUS */
     const handleToggle = (index: Number, item: Game) => {
-    const newStatus = item.status === "active" ? "inactive" : "active";
+        const newStatus = item.status === "active" ? "inactive" : "active";
 
-    setItems(prev =>
-        prev.map((it, i) =>
-            i === index ? { ...it, status: newStatus } : it
-        )
-    );
-};
+        setItems(prev =>
+            prev.map((it, i) =>
+                i === index ? { ...it, status: newStatus } : it
+            )
+        );
+    };
 
     return (
         <div className="p-6 w-full">
