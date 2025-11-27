@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { Game } from "@/lib/types/game";
 import GamesToolbar from "@/components/admin/games/GamesToolbar";
-import SearchBox from "@/components/admin/games/SearchBox";
+import SearchBox from "@/components/admin/shared/SearchBox";
 import GamesTable from "@/components/admin/games/GamesTable";
 
 const AdminGamePage = ({ initialItems }: { initialItems: Game[] }) => {
@@ -25,8 +25,8 @@ const AdminGamePage = ({ initialItems }: { initialItems: Game[] }) => {
 
             <GamesTable
                 items={filtered}
-                onEdit={(idx) => {}}
-                onDelete={(idx) => {}}
+                onEdit={() => {}}
+                onDelete={() => {}}
                 onToggle={(idx) => {
                     setItems(items =>
                         items.map((it, i) =>

@@ -4,7 +4,6 @@ import { RequiredField } from "@/lib/types/game";
 import { IoTrash } from "react-icons/io5";
 import Input from "@/components/form/Input";
 import Select from "@/components/form/Select";
-import Textarea from "@/components/form/TextArea";
 
 interface Props {
     fields: RequiredField[];
@@ -101,7 +100,8 @@ export default function RequiredFieldsBuilder({ fields, onChange }: Props) {
                     )}
 
                     <button
-                        className="text-red-600 flex items-center gap-1"
+                        type="button"
+                        className="text-red-600 flex items-center gap-1 cursor-pointer"
                         onClick={() => removeField(i)}
                     >
                         <IoTrash /> Remove
@@ -111,7 +111,8 @@ export default function RequiredFieldsBuilder({ fields, onChange }: Props) {
 
             <button
                 onClick={addField}
-                className="px-4 py-2 bg-black text-white rounded-lg"
+                type="button"
+                className="text-green-600 hover:text-green-700 cursor-pointer"
             >
                 + Add Field
             </button>
