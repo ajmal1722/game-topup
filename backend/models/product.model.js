@@ -27,8 +27,13 @@ const productSchema = new mongoose.Schema(
             default: "",
         },
 
-        image: {
+        imageUrl: {
             type: String, // Cloudinary URL or asset URL
+            default: null,
+        },
+
+        imagePublicId: {
+            type: String, // Cloudinary public ID for image management
             default: null,
         },
 
