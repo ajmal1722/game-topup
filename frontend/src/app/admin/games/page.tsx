@@ -8,4 +8,4 @@ const GamesPage = async () => {
     return <AdminGamePage initialItems={data} />
 }
 
-export default GamesPage
+export default GamesPage;

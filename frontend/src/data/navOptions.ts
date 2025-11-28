@@ -4,7 +4,8 @@ import {
     FaHome, 
     FaUsers, 
     FaGamepad, 
-    FaCogs 
+    FaCogs,
+    FaBoxOpen
 } from "react-icons/fa";
 import { MdPayment, MdHistory } from "react-icons/md";
 import { TbMailSearch } from "react-icons/tb";
@@ -59,14 +60,19 @@ export const adminNavOptions = [
         icon: FaUsers,
     },
     {
-        label: "Orders",
-        to: "/admin/orders",
-        icon: TbMailSearch,
-    },
-    {
         label: "Games & Pricing",
         to: "/admin/games",
         icon: FaGamepad,
+    },
+    {
+        label: "Products",
+        to: "/admin/products",
+        icon: FaBoxOpen,
+    },
+    {
+        label: "Orders",
+        to: "/admin/orders",
+        icon: TbMailSearch,
     },
     {
         label: "Payments",
