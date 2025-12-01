@@ -3,46 +3,53 @@ import { useState } from "react";
 import Link from "next/link";
 import { navOptions } from "@/data/navOptions";
 
-// React Icons
-import { RiMenu3Line, RiCloseLine, RiShoppingCartLine, RiUserLine } from "react-icons/ri";
+// Icons
+import {
+    RiMenu3Line,
+    RiCloseLine,
+    RiShoppingCartLine,
+    RiUserLine,
+} from "react-icons/ri";
 
 export default function Navbar() {
     const [open, setOpen] = useState(false);
 
     return (
-        <nav className="fixed top-0 w-full z-50 backdrop-blur-xl bg-black/30 border-b border-white/10 shadow-lg">
-            {/* Desktop Navbar */}
+        <nav className="nav-glass fixed top-0 w-full z-50 border-b border-white/10">
             <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
                 {/* Logo */}
-                <Link href="/" className="text-xl font-semibold text-primary tracking-wide">
-                    <span className="text-secondary">Game</span>Store
+                <Link href="/" className="text-2xl font-semibold tracking-wide">
+                    <span className="text-secondary font-bold drop-shadow-md">Game</span>
+                    <span className="text-white">Store</span>
                 </Link>
 
-                {/* Desktop Links */}
-                <div className="hidden lg:flex items-center space-x-8 font-medium">
+                {/* Desktop Navigation */}
+                <div className="hidden lg:flex items-center space-x-10 font-medium">
+
                     {navOptions.map((option) => (
-                        <NavItem key={option.name} href={option.path} label={option.name} />
+                        <NavItem
+                            key={option.name}
+                            href={option.path}
+                            label={option.name}
+                        />
                     ))}
 
                     {/* Cart */}
-                    <Link href="/cart" className="relative">
-                        <RiShoppingCartLine className="w-6 h-6 text-white hover:text-primary transition" />
-                        <span className="absolute -top-1 -right-2 bg-primary text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
+                    <Link href="/cart" className="relative group">
+                        <RiShoppingCartLine className="w-6 h-6 text-white group-hover:text-secondary transition" />
+                        <span className="absolute -top-2 -right-3 bg-tertiary text-black text-xs font-bold px-1.5 py-0.5 rounded-full shadow-md">
                             2
                         </span>
                     </Link>
 
                     {/* Profile */}
                     <Link href="/profile">
-                        <RiUserLine className="w-6 h-6 text-white hover:text-primary transition" />
+                        <RiUserLine className="w-6 h-6 text-white hover:text-secondary transition" />
                     </Link>
 
                     {/* Login Button */}
-                    <Link
-                        href="/login"
-                        className="px-4 py-2 rounded-xl bg-primary text-black font-semibold hover:bg-secondary transition"
-                    >
+                    <Link href="/login" className="btn-primary text-sm">
                         Login
                     </Link>
                 </div>
@@ -56,34 +63,45 @@ export default function Navbar() {
                 </button>
             </div>
 
-            {/* Mobile Menu */}
-            {open && (
-                <div className="lg:hidden bg-black/60 backdrop-blur-2xl border-t border-white/10 p-6 space-y-4 animate-fadeIn">
+            {/* Mobile Dropdown Menu */}
+            <div
+                className={`lg:hidden overflow-hidden transition-all duration-300 ${
+                    open ? "max-h-96" : "max-h-0"
+                }`}
+            >
+                <div className="bg-[#0A0F1F]/90 backdrop-blur-2xl border-t border-white/10 p-6 space-y-6 animate-fadeIn">
+
                     {navOptions.map((option) => (
-                        <MobileItem key={option.name} href={option.path} label={option.name} />
+                        <MobileItem
+                            key={option.name}
+                            href={option.path}
+                            label={option.name}
+                        />
                     ))}
 
                     <Link
                         href="/login"
-                        className="block w-full text-center py-3 rounded-xl bg-primary text-black hover:bg-secondary transition"
+                        className="block w-full text-center py-3 rounded-xl bg-secondary font-semibold text-white hover:opacity-90 transition"
                     >
                         Login / Signup
                     </Link>
                 </div>
-            )}
+            </div>
         </nav>
     );
 }
 
-/* Reusable Nav Item */
+/* Desktop Nav Item */
 function NavItem({ href, label }: { href: string; label: string }) {
     return (
         <Link
             href={href}
-            className="text-white hover:text-primary transition relative group"
+            className="text-white relative group tracking-wide"
         >
             {label}
-            <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-primary transition-all duration-300 group-hover:w-full"></span>
+
+            {/* Neon underline */}
+            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full shadow-glow"></span>
         </Link>
     );
 }
@@ -93,7 +111,7 @@ function MobileItem({ href, label }: { href: string; label: string }) {
     return (
         <Link
             href={href}
-            className="block text-white text-lg font-medium hover:text-primary transition"
+            className="block text-white text-lg font-medium hover:text-secondary transition"
         >
             {label}
         </Link>
