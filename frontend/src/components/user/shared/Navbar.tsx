@@ -16,7 +16,7 @@ export default function Navbar() {
 
     return (
         <nav className="nav-glass fixed top-0 w-full z-50 border-b border-white/10">
-            <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto lg:px-0 px-3 h-16 flex items-center justify-between">
 
                 {/* Logo */}
                 <Link href="/" className="text-2xl font-semibold tracking-wide">

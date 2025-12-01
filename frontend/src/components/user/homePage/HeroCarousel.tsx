@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Game } from "@/lib/types/game";
+import { useRouter } from "next/navigation";
 
 export default function HeroCarousel({ games }: { games: Game[] }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [autoPlay, setAutoPlay] = useState(true);
+    const router = useRouter();
 
     // Go to slide
     const goToSlide = (index: number) => {
@@ -29,14 +31,20 @@ export default function HeroCarousel({ games }: { games: Game[] }) {
     const prevSlide = () =>
         goToSlide((currentIndex - 1 + games.length) % games.length);
 
+    // Click redirect
+    const handleRedirect = (slug: string) => {
+        router.push(`/${slug}`); // currently redirect to "/"
+    };
+
     return (
-        <section className="py-20 px-4 sm:px-6 lg:px-8  relative overflow-hidden">
+        <section className="relative overflow-hidden">
 
             <div className="max-w-7xl mx-auto relative z-10">
 
-                {/* Main carousel */}
-                <div className="relative mb-8 lg:mt-8">
+                {/* Carousel */}
+                <div className="relative lg:mt-8 mt-3">
                     <div className="relative overflow-hidden rounded-xl">
+
                         <div className="relative max-h-[80vh] lg:min-h-[60vh] min-h-[30vh]">
 
                             {games.map((game, index) => (
@@ -50,30 +58,23 @@ export default function HeroCarousel({ games }: { games: Game[] }) {
                                             : "opacity-0 scale-95 -translate-x-full"
                                     }`}
                                 >
+                                    {/* CLICKABLE WHOLE SLIDE */}
                                     <div
-                                        className={`h-full relative overflow-hidden`}
+                                        className="h-full w-full cursor-pointer relative"
+                                        onClick={() => handleRedirect(game.slug)}
                                     >
-                                        {/* Pattern (unchanged) */}
-                                        <div className="absolute inset-0 opacity-20">
-                                            <div
-                                                style={{
-                                                    backgroundImage:
-                                                        "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
-                                                    backgroundSize: "50px 50px",
-                                                }}
-                                            />
-                                        </div>
+                                        {/* Background Image */}
+                                        <img
+                                            src={game.imageUrl ?? "/placeholder.png"}
+                                            alt={game.name}
+                                            className="absolute inset-0 w-full h-full object-cover"
+                                        />
 
-                                        {/* Content */}
-                                        <div className="relative h-full flex flex-col items-center justify-center text-white px-4 text-center backdrop-blur-sm">
-                                            
-                                            {/* Game Image */}
-                                            <img
-                                                src={game.imageUrl ?? "/placeholder.png"}
-                                                alt={game.name}
-                                                className="w-40 h-40 object-cover rounded-xl shadow-xl mb-6 border border-white/20"
-                                            />
+                                        {/* Black Overlay to keep text readable if needed */}
+                                        <div className="absolute inset-0 bg-black/30" />
 
+                                        {/* Optional Game Info (kept same centered layout if you want text) */}
+                                        <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center px-4">
                                             <h3 className="text-4xl font-black mb-2">
                                                 {game.name}
                                             </h3>
@@ -82,7 +83,7 @@ export default function HeroCarousel({ games }: { games: Game[] }) {
                                             </p>
                                         </div>
 
-                                        {/* Neon border effect */}
+                                        {/* Neon border effect (unchanged) */}
                                         <div className="absolute inset-0 pointer-events-none border-2 border-white/20 rounded-xl" />
                                     </div>
                                 </div>
@@ -121,7 +122,6 @@ export default function HeroCarousel({ games }: { games: Game[] }) {
                         ))}
                     </div>
                 </div>
-                
             </div>
         </section>
     );
