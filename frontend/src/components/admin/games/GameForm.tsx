@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { Game } from "@/lib/types/game";
 import { GamePayload } from "@/services/games/types";
-import ImageUploader from "./ImageUploader";
+import ImageUploader from "@/components/form/ImageUploader";
 import RequiredFieldsBuilder from "./RequiredFieldsBuilder";
-import StatusToggle from "./StatusToggle";
+import StatusToggle from "@/components/form/StatusToggle";
 import Input from "@/components/form/Input";
 import Textarea from "@/components/form/TextArea";
 import SubmitButton from "@/components/ui/SubmitButton";
@@ -153,6 +153,7 @@ export default function GameForm({ gameId }: Props) {
                 <Input
                     label="Game Name"
                     placeholder="Enter game name"
+                    value={form.name}
                     required
                     error={errors.name}
                     onChange={(e) => {
@@ -167,6 +168,7 @@ export default function GameForm({ gameId }: Props) {
                 <Textarea
                     label="Description"
                     placeholder="Enter description"
+                    value={form.description}
                     required
                     error={errors.description}
                     onChange={(e) => {

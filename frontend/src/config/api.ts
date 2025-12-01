@@ -15,6 +15,11 @@ export const endpoints = {
         root: "/api/games",
         byId: (id: string) => `/api/games/${id}`,
     },
+    products: {
+        root: "/api/products",
+        byId: (id: string) => `/api/products/${id}`,
+        bySlug: (slug: String) => `/api/products/${slug}`
+    }
     // add more domains here (products, orders, users, etc.)
 };
 

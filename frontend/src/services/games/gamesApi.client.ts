@@ -2,9 +2,10 @@
 "use client";
 
 import { clientApi } from "@/lib/http/index";
+import { endpoints } from "@/config/api";
+import { toFormData } from "@/utils/convertToFormData";
 import { ApiResponse, Game, GamesListResponse } from "@/lib/types/game";
 import { GamePayload } from "./types";
-import { endpoints } from "@/config/api";
 
 export const gamesApiClient = {
     async list(params?: Record<string, unknown> | undefined): Promise<GamesListResponse> {
@@ -38,15 +39,3 @@ export const gamesApiClient = {
         return data;
     },
 };
-
-// Convert payload → FormData
-function toFormData(payload: GamePayload) {
-    const fd = new FormData();
-    fd.append("name", payload.name);
-    if (payload.slug) fd.append("slug", payload.slug);
-    if (payload.description) fd.append("description", payload.description);
-    fd.append("status", payload.status);
-    fd.append("requiredFields", JSON.stringify(payload.requiredFields || []));
-    if (payload.image) fd.append("image", payload.image);
-    return fd;
-}
