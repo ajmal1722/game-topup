@@ -1,119 +1,152 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
-import { navOptions } from "@/data/navOptions";
+import Image from "next/image";
+import logo from "@/assets/logo/logo-nobg.png";
 
-// Icons
-import {
-    RiMenu3Line,
-    RiCloseLine,
-    RiShoppingCartLine,
-    RiUserLine,
-} from "react-icons/ri";
+import { RiMenu3Line, RiCloseLine, RiSearchLine, RiUserLine } from "react-icons/ri";
+
+// SAMPLE GAMES LIST (Replace with your API or data)
+const games = [
+    { name: "Efootball 2024", slug: "efootball-2024" },
+    { name: "PUBG Mobile", slug: "pubg" },
+    { name: "Free Fire", slug: "free-fire" },
+    { name: "MLBB", slug: "mlbb" },
+    { name: "Genshin Impact", slug: "genshin" },
+    { name: "Call of Duty Mobile", slug: "codm" },
+];
 
 export default function Navbar() {
     const [open, setOpen] = useState(false);
+    const [gamesOpen, setGamesOpen] = useState(false);
 
     return (
-        <nav className="nav-glass fixed top-0 w-full z-50 border-b border-white/10">
-            <div className="max-w-7xl mx-auto lg:px-0 px-3 h-16 flex items-center justify-between">
+        <nav className="fixed top-0 w-full z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
+            <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
                 {/* Logo */}
-                <Link href="/" className="text-2xl font-semibold tracking-wide">
-                    <span className="text-secondary font-bold drop-shadow-md">Game</span>
-                    <span className="text-white">Store</span>
+                <Link href="/" className="flex items-center gap-2">
+                    <Image src={logo} alt="Logo" className="h-12 w-auto object-contain" />
                 </Link>
 
-                {/* Desktop Navigation */}
-                <div className="hidden lg:flex items-center space-x-10 font-medium">
+                {/* Desktop Nav */}
+                <div className="hidden lg:flex items-center gap-10">
 
-                    {navOptions.map((option) => (
-                        <NavItem
-                            key={option.name}
-                            href={option.path}
-                            label={option.name}
+                    {/* Home */}
+                    <NavLink href="/" label="Home" />
+
+                    {/* Games */}
+                    <NavLink href="/categories" label="Games" />
+
+                    {/* Blog */}
+                    <NavLink href="/blog" label="Blog" />
+
+                    {/* Search Field */}
+                    <div className="relative w-52 group">
+                        <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 group-hover:text-secondary transition" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-3 py-2 text-white placeholder-gray-400
+                focus:outline-none focus:border-secondary focus:shadow-[0_0_12px_rgba(255,120,0,0.4)]
+                transition-all"
                         />
-                    ))}
+                    </div>
 
-                    {/* Cart */}
-                    <Link href="/cart" className="relative group">
-                        <RiShoppingCartLine className="w-6 h-6 text-white group-hover:text-secondary transition" />
-                        <span className="absolute -top-2 -right-3 bg-tertiary text-black text-xs font-bold px-1.5 py-0.5 rounded-full shadow-md">
-                            2
-                        </span>
-                    </Link>
+                    {/* Language / Currency */}
+                    <LangCurrencySelector />
 
-                    {/* Profile */}
-                    <Link href="/profile">
-                        <RiUserLine className="w-6 h-6 text-white hover:text-secondary transition" />
-                    </Link>
-
-                    {/* Login Button */}
-                    <Link href="/login" className="btn-primary text-sm">
+                    {/* Login / Account */}
+                    <Link
+                        href="/login"
+                        className="px-5 py-2 bg-secondary text-black rounded-xl font-semibold hover:bg-tertiary transition"
+                    >
                         Login
                     </Link>
                 </div>
 
-                {/* Mobile Menu Button */}
+                {/* Mobile Toggle */}
                 <button
                     onClick={() => setOpen(!open)}
                     className="lg:hidden text-white"
                 >
-                    {open ? <RiCloseLine size={28} /> : <RiMenu3Line size={28} />}
+                    {open ? <RiCloseLine size={26} /> : <RiMenu3Line size={26} />}
                 </button>
             </div>
 
-            {/* Mobile Dropdown Menu */}
-            <div
-                className={`lg:hidden overflow-hidden transition-all duration-300 ${
-                    open ? "max-h-96" : "max-h-0"
-                }`}
-            >
-                <div className="bg-[#0A0F1F]/90 backdrop-blur-2xl border-t border-white/10 p-6 space-y-6 animate-fadeIn">
+            {/* Mobile Menu */}
+            {open && (
+                <div className="lg:hidden bg-[#0B0F1C]/95 backdrop-blur-2xl border-t border-white/10 p-6 animate-fadeIn">
+                    <MobileLink href="/" label="Home" />
 
-                    {navOptions.map((option) => (
-                        <MobileItem
-                            key={option.name}
-                            href={option.path}
-                            label={option.name}
-                        />
-                    ))}
+                    <MobileLink href="/categories" label="Games" />
 
+                    <MobileLink href="/blog" label="Blog" />
+
+                    {/* Login */}
                     <Link
                         href="/login"
-                        className="block w-full text-center py-3 rounded-xl bg-secondary font-semibold text-white hover:opacity-90 transition"
+                        className="block mt-6 w-full text-center bg-secondary py-3 rounded-xl font-semibold text-black"
                     >
-                        Login / Signup
+                        Login
                     </Link>
                 </div>
-            </div>
+            )}
         </nav>
     );
 }
 
-/* Desktop Nav Item */
-function NavItem({ href, label }: { href: string; label: string }) {
+/* ------------------------------- */
+/* Reusable Desktop Nav Link */
+/* ------------------------------- */
+function NavLink({ href, label }: { href: string; label: string }) {
     return (
         <Link
             href={href}
-            className="text-white relative group tracking-wide"
+            className="text-white relative group"
         >
             {label}
-
-            {/* Neon underline */}
-            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full shadow-glow"></span>
+            <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-secondary transition-all duration-300 group-hover:w-full"></span>
         </Link>
     );
 }
 
-/* Mobile Nav Item */
-function MobileItem({ href, label }: { href: string; label: string }) {
+/* ------------------------------- */
+/* Mobile Nav Link */
+/* ------------------------------- */
+function MobileLink({ href, label }: { href: string; label: string }) {
     return (
         <Link
             href={href}
-            className="block text-white text-lg font-medium hover:text-secondary transition"
+            className="block text-gray-300 text-lg py-1 hover:text-secondary transition"
         >
             {label}
         </Link>
+    );
+}
+
+/* ------------------------------- */
+/* Language / Currency Selector */
+/* ------------------------------- */
+function LangCurrencySelector() {
+    return (
+        <div className="relative group">
+            <button
+                className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-300 flex items-center gap-2 hover:border-secondary transition"
+            >
+                🌐 EN • USD
+            </button>
+
+            <div
+                className="absolute hidden group-hover:block right-0 top-12 bg-[#0B0F1C]/95 backdrop-blur-xl border border-white/10 rounded-xl p-4 w-40 shadow-xl"
+            >
+                <div className="flex flex-col gap-2 text-sm">
+                    <button className="text-left hover:text-secondary">🇺🇸 English • USD</button>
+                    <button className="text-left hover:text-secondary">🇮🇳 English • INR</button>
+                    <button className="text-left hover:text-secondary">🇦🇪 Arabic • AED</button>
+                </div>
+            </div>
+        </div>
     );
 }
