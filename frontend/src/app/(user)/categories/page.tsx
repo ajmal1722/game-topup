@@ -7,7 +7,7 @@ export default function CategoryPage() {
     const [openMobileFilters, setOpenMobileFilters] = useState(false);
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-20 flex flex-col lg:flex-row gap-10">
+        <div className="max-w-7xl mx-auto px-4 lg:px-0 py-20 flex flex-col lg:flex-row gap-10">
 
             {/* Sidebar – Desktop */}
             <aside
