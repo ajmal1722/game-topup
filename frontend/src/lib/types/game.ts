@@ -13,6 +13,7 @@ export type Game = {
     _id: string;
     name: string;
     slug: string;
+    category: string;
     imageUrl: string | null;
     imagePublicId?: string | null;
     description: string;

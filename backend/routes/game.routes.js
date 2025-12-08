@@ -12,7 +12,7 @@ router.get('/:slug' , getGameDetails)
 
 // Admin only: create, update, delete
 router.post("/", protect, authorize("admin"), upload.single('image'), createGame);
-router.put("/:id", protect, authorize("admin"), upload.single('image'), updateGame);
+router.put("/:slug", protect, authorize("admin"), upload.single('image'), updateGame);
 router.delete("/:id", protect, authorize("admin"), deleteGame);
 
 export default router;

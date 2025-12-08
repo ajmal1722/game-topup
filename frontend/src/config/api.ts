@@ -14,6 +14,7 @@ export const endpoints = {
     games: {
         root: "/api/games",
         byId: (id: string) => `/api/games/${id}`,
+        bySlug: (slug: String) => `/api/games/${slug}`
     },
     products: {
         root: "/api/products",

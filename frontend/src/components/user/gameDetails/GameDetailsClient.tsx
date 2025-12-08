@@ -58,23 +58,7 @@ export default function GameDetailsClient({ gameDetails }: { gameDetails: GameWi
                 <aside className="w-full lg:w-1/3 flex flex-col gap-6">
 
                     <UserDetailsForm
-                        fields={[
-                            { id: "uid", label: "Player UID", required: true, type: "text" },
-                            {
-                                id: "server",
-                                label: "Server",
-                                required: true,
-                                type: "select",
-                                options: ["Asia", "Europe", "South America"],
-                            },
-                            {
-                                id: "platform",
-                                label: "Platform",
-                                required: true,
-                                type: "select",
-                                options: ["Android", "iOS"],
-                            },
-                        ]}
+                        fields={gameDetails.requiredFields || []}
                     />
 
                     {/* Checkout Box */}
@@ -86,5 +70,3 @@ export default function GameDetailsClient({ gameDetails }: { gameDetails: GameWi
         </div>
     );
 }
-
-

@@ -91,6 +91,7 @@ const getGameDetails = asyncHandler(async (req, res) => {
 // @access  Admin
 const createGame = asyncHandler(async (req, res) => {
     const { name, description, status } = req.body;
+    console.log('cate;', req.body.category);
 
     // 1. Parse & Validate requiredFields
     let requiredFields = req.body.requiredFields;
@@ -236,10 +237,10 @@ const createGame = asyncHandler(async (req, res) => {
 
 const updateGame = asyncHandler(async (req, res) => {
     const { name, description, status } = req.body;
-    const category = req.body.category.trim().toLowerCase();
+    const category = req.body.category?.trim().toLowerCase();
 
     // 1. Fetch existing game
-    const game = await Game.findById(req.params.id);
+    const game = await Game.findOne({ slug: req.params.slug });
     if (!game) {
         return res.status(404).json({
             success: false,
