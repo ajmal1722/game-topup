@@ -164,7 +164,7 @@ function ProductGrid({ selectedProduct, setSelectedProduct }: any) {
                     `}
                 >
                     <img
-                        src={product.img}
+                        src='https://shop.ldrescdn.com/rms/ld-space/process/img/6d35ced1c43d41979b5c0676add9b82d1763971709.webp?x-oss-process=image/resize,m_fill,h_160,w_160/format,webp'
                         className="rounded-lg w-full h-28 object-cover mb-3 group-hover:scale-105 transition-transform"
                     />
 
@@ -284,17 +284,14 @@ function UserDetailsForm({ fields }: { fields: any[] }) {
                             <input
                                 type="text"
                                 placeholder={`Enter ${field.label}`}
-                                className="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-xl 
-                                placeholder-gray-400 backdrop-blur-lg focus:outline-none
-                                focus:border-secondary focus:shadow-[0_0_10px_rgba(255,120,0,0.4)] transition-all"
+                                className="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-xl placeholder-gray-400 backdrop-blur-lg focus:outline-none focus:border-secondary focus:shadow-[0_0_10px_rgba(255,120,0,0.4)] transition-all"
                             />
                         )}
 
                         {field.type === "select" && (
                             <div className="relative">
                                 <select
-                                    className="w-full px-4 py-2 bg-white/5 border border-white/10 text-white rounded-xl
-                                    backdrop-blur-lg appearance-none focus:border-secondary focus:shadow-[0_0_10px_rgba(255,120,0,0.4)]"
+                                    className="w-full px-4 py-2 bg-white/5 border border-white/10 text-white rounded-xl backdrop-blur-lg appearance-none focus:border-secondary focus:shadow-[0_0_10px_rgba(255,120,0,0.4)]"
                                 >
                                     <option className="text-black">Select {field.label}</option>
                                     {field.options.map((opt: string) => (
