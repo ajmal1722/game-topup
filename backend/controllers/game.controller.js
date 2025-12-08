@@ -57,8 +57,22 @@ const getGames = asyncHandler(async (req, res) => {
 });
 
 const getGameDetails = asyncHandler(async (req, res) => {
-    const game = await Game.findById(req.params.id);
-    
+    const { id } = req.params;
+
+    const game = await Game.aggregate([
+        {
+            $match: { _id: new mongoose.Types.ObjectId(id) }
+        },
+        {
+            $lookup: {
+                from: 'products',
+                localField: '_id',
+                foreignField: 'gameId',
+                as: 'products'
+            }
+        }
+    ]);
+
     if (!game) {
         return res.status(404).json({
             success: false,
