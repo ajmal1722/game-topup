@@ -57,11 +57,11 @@ const getGames = asyncHandler(async (req, res) => {
 });
 
 const getGameDetails = asyncHandler(async (req, res) => {
-    const { id } = req.params;
+    const { slug } = req.params;
 
     const game = await Game.aggregate([
         {
-            $match: { _id: new mongoose.Types.ObjectId(id) }
+            $match: { slug: slug }
         },
         {
             $lookup: {
@@ -73,15 +73,16 @@ const getGameDetails = asyncHandler(async (req, res) => {
         }
     ]);
 
-    if (!game) {
+    if (game.length === 0) {
         return res.status(404).json({
             success: false,
             message: "Game not found",
         });
     }
+
     return res.status(200).json({
         success: true,
-        data: game,
+        data: game[0],   // return the single game, not the array
     });
 });
 

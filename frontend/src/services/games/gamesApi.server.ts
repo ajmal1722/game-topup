@@ -1,6 +1,6 @@
 // src/services/games/gamesApi.server.ts
 import { serverApi } from "@/lib/http/server";
-import { Game, GamesListResponse } from "@/lib/types/game";
+import { Game, GamesListResponse, GameWithProducts, ApiResponse } from "@/lib/types/game";
 import { GamePayload } from "./types";
 import { endpoints } from "@/config/api";
 
@@ -9,8 +9,8 @@ export const gamesApiServer = {
         return serverApi.get(endpoints.games.root);
     },
 
-    async get(id: string): Promise<Game> {
-        return serverApi.get(endpoints.games.byId(id));
+    async get(slug: string): Promise<ApiResponse<GameWithProducts>> {
+        return serverApi.get(endpoints.games.byId(slug));
     },
 
     async create(payload: GamePayload): Promise<Game> {

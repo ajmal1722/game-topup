@@ -1,3 +1,5 @@
+import { Product } from "./product";
+
 export type RequiredField = {
     fieldName: string;
     fieldKey: string;
@@ -27,6 +29,9 @@ export type GamesListResponse = {
     data: Game[];
 };
 
+export type GameWithProducts = Game & {
+    products: Product[];
+};
 export interface ApiResponse<T> {
     data: T;
 }

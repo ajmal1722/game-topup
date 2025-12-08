@@ -8,7 +8,7 @@ const router = Router();
 
 // Public: list all games
 router.get("/", getGames);
-router.get('/:id' , getGameDetails)
+router.get('/:slug' , getGameDetails)
 
 // Admin only: create, update, delete
 router.post("/", protect, authorize("admin"), upload.single('image'), createGame);
