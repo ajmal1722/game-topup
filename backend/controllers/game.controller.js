@@ -9,15 +9,19 @@ const getGames = asyncHandler(async (req, res) => {
     const {
         search = "",
         status,
-        page = 1,
-        limit = 20,
+        page,
+        limit = 12,
         sort = "createdAt",
         order = "desc"
     } = req.query;
 
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 12;
+    const skip = (pageNum - 1) * limitNum;
+
     const query = {};
 
-    // 2. Search by name or description
+    // 2. Search
     if (search) {
         query.$or = [
             { name: { $regex: search, $options: "i" } },
@@ -25,34 +29,32 @@ const getGames = asyncHandler(async (req, res) => {
         ];
     }
 
-    // 3. Filter by status (active/inactive)
+    // 3. Status filter
     if (status && ["active", "inactive"].includes(status)) {
         query.status = status;
     }
-    // 4. Pagination
-    const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // 5. Sorting
+    // 4. Sorting
     const sortQuery = {
-        [sort]: order === "asc" ? 1 : -1,
+        [sort]: order === "asc" ? 1 : -1
     };
 
-    // 6. Fetch Games
+    // 5. Fetch paginated games
     const games = await Game.find(query)
         .sort(sortQuery)
         .skip(skip)
-        .limit(parseInt(limit));
+        .limit(limitNum);
 
     const total = await Game.countDocuments(query);
 
-    // 7. Send Response
     return res.status(200).json({
         success: true,
         total,
-        page: Number(page),
-        totalPages: Math.ceil(total / limit),
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum),
         count: games.length,
-        data: games,
+        data: games
     });
 });
 

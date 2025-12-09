@@ -1,13 +1,18 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { RiArrowDownSLine, RiFilter3Line } from "react-icons/ri";
 import FilterSection from "@/components/user/categories/FilterSection";
-import GameCard from "@/components/user/categories/GameCard";
 import { Game } from "@/services/games";
 import GamesList from "./GameList";
+import Pagination from "./Pagination";
 
-const CategoryListingPage = ({ games }: { games: Game[] }) => {
+interface CategoryListingPageProps {
+    games: Game[];
+    currentPage: number;
+    totalPages: number;
+}
+const CategoryListingPage = ({ games, currentPage, totalPages }: CategoryListingPageProps) => {
     const [openMobileFilters, setOpenMobileFilters] = useState(false);
 
     return (
@@ -66,8 +71,11 @@ const CategoryListingPage = ({ games }: { games: Game[] }) => {
                     </div>
                 </div>
 
-                {/* Products Grid */}
+                {/* Games Grid */}
                 <GamesList games={games} />
+
+                {/* Pagination */}
+                <Pagination currentPage={currentPage} totalPages={totalPages} />
             </div>
         </div>
     );

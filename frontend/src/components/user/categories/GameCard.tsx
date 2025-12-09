@@ -39,12 +39,7 @@ const GameCard = ({ game }: { game: Game}) => {
 
             {/* Hover glow ring */}
             <div
-                className="
-                    absolute inset-0 rounded-2xl 
-                    opacity-0 group-hover:opacity-100
-                    transition duration-700 pointer-events-none
-                    bg-gradient-to-r from-secondary/15 via-transparent to-secondary/15
-                "
+                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-700 pointer-events-none bg-gradient-to-r from-secondary/15 via-transparent to-secondary/15"
             />
         </Link>
     )
