@@ -14,7 +14,7 @@ export type Game = {
     name: string;
     slug: string;
     category: string;
-    imageUrl: string | null;
+    imageUrl: string;
     imagePublicId?: string | null;
     description: string;
     requiredFields: RequiredField[];

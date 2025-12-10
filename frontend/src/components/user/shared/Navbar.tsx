@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import logo from "@/assets/logo/logo-nobg.png";
+import SearchBoxDesktop from "./SearchBoxDesktop";
 
 import {
     RiMenu2Line ,
@@ -12,7 +13,6 @@ import {
     RiSearchLine,
     RiUserLine,
 } from "react-icons/ri";
-import SearchBoxDesktop from "./SearchBoxDesktop";
 
 export default function Navbar() {
     const [open, setOpen] = useState(false);
@@ -63,10 +63,10 @@ export default function Navbar() {
                     <button onClick={() => setOpen(!open)}>
                         {open ? <RiCloseLine size={26} /> : <RiMenu2Line  size={26} />}
                     </button>
-
-                    <button>
+                        
+                    <Link href="/search">
                         <RiSearchLine size={24} />
-                    </button>
+                    </Link>
                 </div>
 
                 {/* CENTER — LOGO */}
