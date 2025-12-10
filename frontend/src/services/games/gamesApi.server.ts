@@ -5,7 +5,7 @@ import { GamePayload } from "./types";
 import { endpoints } from "@/config/api";
 
 export const gamesApiServer = {
-    async list(params?: { page: number, limit: number }): Promise<GamesListResponse> {
+    async list(params?: { page: number, limit: number, category?: string }): Promise<GamesListResponse> {
         return serverApi.get(endpoints.games.root, { params });
     },
 

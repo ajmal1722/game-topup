@@ -4,10 +4,11 @@ import CategoryListingPage from "@/components/user/categories/CategoryListingPag
 
 export default async function CategoryPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     const params = await searchParams;
+    const category = typeof params.category === "string" ? params.category : undefined;
     const page =  Number(params.page) || 1;
     const limit = 4;
 
-    const res = await gamesApiServer.list({ page, limit });
+    const res = await gamesApiServer.list({ page, limit, category });
 
     const games: Game[] = res.data;
     const totalPages: number = res.totalPages;

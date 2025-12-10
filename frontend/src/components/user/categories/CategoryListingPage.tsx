@@ -12,6 +12,7 @@ interface CategoryListingPageProps {
     currentPage: number;
     totalPages: number;
 }
+
 const CategoryListingPage = ({ games, currentPage, totalPages }: CategoryListingPageProps) => {
     const [openMobileFilters, setOpenMobileFilters] = useState(false);
 
