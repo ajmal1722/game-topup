@@ -1,12 +1,16 @@
 // src/services/games/gamesApi.server.ts
 import { serverApi } from "@/lib/http/server";
-import { Game, GamesListResponse, GameWithProducts, ApiResponse } from "@/lib/types/game";
+import { Game, GamesListResponse, GameWithProducts, ApiResponse, CategoryResponse } from "@/lib/types/game";
 import { GamePayload } from "./types";
 import { endpoints } from "@/config/api";
 
 export const gamesApiServer = {
     async list(params?: { page: number, limit: number }): Promise<GamesListResponse> {
         return serverApi.get(endpoints.games.root, { params });
+    },
+
+    async listHomeGames(): Promise<CategoryResponse> {
+        return serverApi.get(endpoints.games.home);
     },
 
     async get(id: string): Promise<ApiResponse<GameWithProducts>> {

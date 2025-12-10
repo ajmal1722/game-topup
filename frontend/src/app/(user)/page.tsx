@@ -6,15 +6,20 @@ import { Game } from "@/lib/types/game";
 
 export default async function Page() {
     // Here you will fetch real games from DB or API
-    const games = await gamesApiServer.list();
-    const data: Game[] = games.data || [];
+    // const games = await gamesApiServer.list();
+    // const data: Game[] = games.data || [];
+
+    const res = await gamesApiServer.listHomeGames();
+    const data = res.categories;
+
+    console.log("Home Page Games:", data);
 
     return (
         <div className="py-20 bg-linear-to-b from-primary to-primary/90">
             <div className="max-w-7xl mx-auto lg:px-0 px-3">
-                <HeroCarousel games={data} />
-                <HotProducts games={data} />
-                <GameCategoryListing />
+                {/* <HeroCarousel games={data} />
+                <HotProducts games={data} /> */}
+                <GameCategoryListing categories={data} />
             </div>
         </div>
     );

@@ -106,8 +106,8 @@ const getHomePageGames = asyncHandler(async (req, res) => {
 
     res.status(200).json({
         success: true,
-        sections: result,
-        totalSections: result.length
+        categories: result,
+        totalCategories: result.length
     });
 });
 

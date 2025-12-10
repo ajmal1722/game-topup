@@ -33,6 +33,18 @@ export type GamesListResponse = {
 export type GameWithProducts = Game & {
     products: Product[];
 };
+
+export type CategoryGameSection = {
+    category: string;
+    games: Game[];
+};
+
+export type CategoryResponse = {
+    success: boolean;
+    categories: CategoryGameSection[];
+    totalCategories: number;
+};
+
 export interface ApiResponse<T> {
     data: T;
 }
