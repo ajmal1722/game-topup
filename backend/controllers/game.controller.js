@@ -111,6 +111,15 @@ const getHomePageGames = asyncHandler(async (req, res) => {
     });
 });
 
+const getDistinctCategories = asyncHandler(async (req, res) => {
+    const categories = await Game.distinct("category");
+
+    return res.status(200).json({
+        success: true,
+        categories
+    });
+});
+
 const getGameDetails = asyncHandler(async (req, res) => {
     const { slug } = req.params;
 
@@ -458,6 +467,7 @@ const deleteGame = asyncHandler(async (req, res) => {
 export {
     getGames,
     getHomePageGames,
+    getDistinctCategories,
     getGameDetails,
     createGame,
     updateGame,
