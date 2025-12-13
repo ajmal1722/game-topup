@@ -1,9 +1,12 @@
 import User from "../models/user.model.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { sendAuthPair, rotateRefreshToken, revokeRefreshToken, setAuthCookies, generateAccessToken } from "../utils/token.js";
+import { generateVerifyToken } from "../utils/token.js";
+import { sendVerificationEmail } from "../utils/senderVerificationEmail.js";
 
 export const register = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
+
     if (!name || !email || !password) {
         res.status(400);
         throw new Error("Name, email and password are required");
@@ -15,8 +18,61 @@ export const register = asyncHandler(async (req, res) => {
         throw new Error("Email already in use");
     }
 
-    const user = await User.create({ name, email, password });
-    return sendAuthPair(user, 201, res, req.ip);
+    // 1. Create user (unverified)
+    const user = await User.create({
+        name,
+        email,
+        password,
+        isVerified: false
+    });
+
+    // 2. Gen verify token
+    const { token, hashed, expires } = generateVerifyToken();
+
+    user.verificationToken = hashed;
+    user.verificationTokenExpires = expires;
+    await user.save();
+
+    // 3. Send verification email
+    await sendVerificationEmail(email, token);
+
+    return res.status(201).json({
+        success: true,
+        message: "Account created. Please verify your email."
+    });
+});
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+    const { token } = req.query;
+
+    if (!token) {
+        res.status(400);
+        throw new Error("Token missing");
+    }
+
+    const hashed = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+        verificationToken: hashed,
+        verificationTokenExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+        res.status(400);
+        throw new Error("Token invalid or expired");
+    }
+
+    // Mark verified
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+    await user.save();
+
+    // Option 1: Auto login user
+    return sendAuthPair(user, 200, res, req.ip);
+
+    // Option 2: Just show success message
+    // res.status(200).json({ success: true, message: "Email verified" });
 });
 
 export const login = asyncHandler(async (req, res) => {
