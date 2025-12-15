@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { sendAuthPair, rotateRefreshToken, revokeRefreshToken, setAuthCookies, generateAccessToken } from "../utils/token.js";
 import { sendVerificationEmail } from "../utils/senderVerificationEmail.js";
+import { sendPasswordResetEmail } from "../utils/sendPasswordResetEmail.js";
 import crypto from "crypto";
 
 export const register = asyncHandler(async (req, res) => {
@@ -202,4 +203,68 @@ export const refreshToken = asyncHandler(async (req, res) => {
     const access = generateAccessToken(rotated.userId);
     setAuthCookies(res, access, rotated.newValue);
     res.status(200).json({ success: true, token: access });
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        res.status(404);
+        throw new Error("User not found");
+    }
+
+    // Get reset token
+    const resetToken = user.getResetPasswordToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    try {
+        await sendPasswordResetEmail(user.email, resetToken);
+
+        res.status(200).json({
+            success: true,
+            message: "Email sent",
+        });
+    } catch (error) {
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save({ validateBeforeSave: false });
+
+        res.status(500);
+        throw new Error("Email could not be sent");
+    }
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+    const user = await User.findOne({
+        resetPasswordToken,
+        resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+        res.status(400);
+        throw new Error("Invalid or expired password reset token");
+    }
+
+    // Set new password
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Password reset successful",
+    });
 });
