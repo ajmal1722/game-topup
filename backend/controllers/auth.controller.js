@@ -43,14 +43,12 @@ export const register = asyncHandler(async (req, res) => {
 });
 
 export const verifyEmail = asyncHandler(async (req, res) => {
-    const { token } = req.query;
+    const { token } = req.params;
 
-    if (!token) {
-        res.status(400);
-        throw new Error("Token missing");
-    }
-
-    const hashed = crypto.createHash("sha256").update(token).digest("hex");
+    const hashed = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
 
     const user = await User.findOne({
         verificationToken: hashed,
@@ -59,20 +57,49 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
     if (!user) {
         res.status(400);
-        throw new Error("Token invalid or expired");
+        throw new Error("Invalid or expired verification token");
     }
 
-    // Mark verified
     user.isVerified = true;
     user.verificationToken = undefined;
     user.verificationTokenExpires = undefined;
+
     await user.save();
 
-    // Option 1: Auto login user
-    return sendAuthPair(user, 200, res, req.ip);
+    res.status(200).json({
+        success: true,
+        message: "Email verified successfully"
+    });
+});
 
-    // Option 2: Just show success message
-    // res.status(200).json({ success: true, message: "Email verified" });
+export const resendVerification = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        res.status(404);
+        throw new Error("User not found");
+    }
+
+    if (user.isVerified) {
+        res.status(400);
+        throw new Error("User already verified");
+    }
+
+    // Generate new token
+    const { token, hashed, expires } = generateVerifyToken();
+
+    user.verificationToken = hashed;
+    user.verificationTokenExpires = expires;
+    await user.save();
+
+    await sendVerificationEmail(email, token);
+
+    res.status(200).json({
+        success: true,
+        message: "Verification email resent"
+    });
 });
 
 export const login = asyncHandler(async (req, res) => {
@@ -86,6 +113,12 @@ export const login = asyncHandler(async (req, res) => {
     if (!user) {
         res.status(401);
         throw new Error("Invalid credentials");
+    }
+
+    // 🔐 Email verification check
+    if (!user.isVerified) {
+        res.status(403);
+        throw new Error("Please verify your email to continue");
     }
 
     const isMatch = await user.comparePassword(password);
