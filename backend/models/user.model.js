@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const userSchema = new mongoose.Schema(
     {
@@ -35,7 +35,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: null,
         },
-        verificationTokenExpiry: {
+        verificationTokenExpires: {
+            type: Date,
+            default: null,
+        },
+        lastVerificationSentAt: {
             type: Date,
             default: null,
         },
@@ -53,10 +57,21 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.methods.getJwtToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE || "7d",
-    });
+// Generate and hash verification token
+userSchema.methods.generateVerificationToken = function () {
+    // Generate token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    // Hash and set to verificationToken field
+    this.verificationToken = crypto
+        .createHash("sha256")
+        .update(verificationToken)
+        .digest("hex");
+
+    // Set expiration
+    this.verificationTokenExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
+
+    return verificationToken;
 };
 
 export default mongoose.model("User", userSchema);
