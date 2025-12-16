@@ -22,6 +22,11 @@ export const endpoints = {
         root: "/api/products",
         byId: (id: string) => `/api/products/${id}`,
         bySlug: (slug: String) => `/api/products/${slug}`
+    },
+    banners: {
+        root: "/api/banners",
+        admin: "/api/banners/admin",
+        byId: (id: string) => `/api/banners/${id}`
     }
     // add more domains here (products, orders, users, etc.)
 };
