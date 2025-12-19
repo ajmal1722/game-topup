@@ -5,7 +5,7 @@ import { FaCloudUploadAlt, FaEdit, FaTrash } from "react-icons/fa";
 import ImageCropper from "./ImageCropper";
 
 interface Props {
-    imageUrl: string | null;
+    imageUrl: File | string | null;
     onChange: (file: File | null, preview: string | null) => void;
     error?: string;
     aspectRatio?: number;

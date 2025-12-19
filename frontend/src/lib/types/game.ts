@@ -1,13 +1,17 @@
 import { Product } from "./product";
 
-export type RequiredField = {
+export interface RequiredField {
     fieldName: string;
     fieldKey: string;
     fieldType: "text" | "number" | "email" | "dropdown" | string;
     placeholder?: string;
-    options: string[];
+    options?: string[];
+
+    // UI-only helper (NOT sent to backend)
+    optionsText?: string;
+
     required: boolean;
-};
+}
 
 export type Game = {
     _id: string;

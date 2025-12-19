@@ -31,14 +31,13 @@ export interface ProductPayload {
     slug: string;
 
     description?: string;
-
-    image?: string | null;
+    image?: File | string | null;
 
     price: number;
     discountedPrice: number;
 
     deliveryTime?: string;
-    status?: "active" | "inactive";
+    status: "active" | "inactive";
     isPopular?: boolean;
 
     metaTitle?: string;
