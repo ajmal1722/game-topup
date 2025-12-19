@@ -43,3 +43,8 @@ export interface ProductPayload {
     metaTitle?: string;
     metaDescription?: string;
 }
+
+export interface ProductResponse {
+    success: boolean;
+    data: Product;
+}

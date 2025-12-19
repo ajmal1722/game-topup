@@ -15,11 +15,12 @@ import StatusToggle from "@/components/form/StatusToggle";
 import Textarea from "@/components/form/TextArea";
 
 interface ProductFormProps {
-    slug: string | "new";
+    productId: string;
 }
 
-export default function ProductForm({ slug }: ProductFormProps) {
-    const isEdit = slug !== "new";
+export default function ProductForm({ productId }: ProductFormProps) {
+    const isEdit = productId !== "new";
+    console.log('Hello')
 
     const {
         form,
@@ -62,20 +63,21 @@ export default function ProductForm({ slug }: ProductFormProps) {
 
         (async () => {
             try {
-                const res: Product = await productsApiClient.get(slug as string);
+                const res = await productsApiClient.get(productId as string);
+                const product: Product = res.data;
                 updateForm({
-                    gameId: res.gameId,
-                    name: res.name,
-                    slug: res.slug,
-                    description: res.description ?? "",
-                    image: res.imageUrl ?? null,
-                    price: res.price,
-                    discountedPrice: res.discountedPrice,
-                    deliveryTime: res.deliveryTime ?? "Instant Delivery",
-                    status: res.status,
-                    isPopular: res.isPopular ?? false,
-                    metaTitle: res.metaTitle ?? "",
-                    metaDescription: res.metaDescription ?? "",
+                    gameId: product.gameId,
+                    name: product.name,
+                    slug: product.slug,
+                    description: product.description ?? "",
+                    image: product.imageUrl ?? null,
+                    price: product.price,
+                    discountedPrice: product.discountedPrice,
+                    deliveryTime: product.deliveryTime ?? "Instant Delivery",
+                    status: product.status,
+                    isPopular: product.isPopular ?? false,
+                    metaTitle: product.metaTitle ?? "",
+                    metaDescription: product.metaDescription ?? "",
                     imageFile: null,
                 });
             } catch (err) {
@@ -83,7 +85,7 @@ export default function ProductForm({ slug }: ProductFormProps) {
                 toast.error("Failed to load product");
             }
         })();
-    }, [slug, isEdit, updateForm]);
+    }, [productId, isEdit, updateForm]);
 
     /* Validation */
     const validate = (): boolean => {
@@ -150,7 +152,7 @@ export default function ProductForm({ slug }: ProductFormProps) {
             };
 
             if (isEdit) {
-                await productsApiClient.update(slug as string, payload);
+                await productsApiClient.update(productId, payload);
             } else {
                 await productsApiClient.create(payload);
             }

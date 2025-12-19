@@ -218,8 +218,8 @@ const getProducts = asyncHandler(async (req, res) => {
 });
 
 const getSingleProduct = asyncHandler(async (req, res) => {
-    const { slug } = req.params;
-    const product = await Product.findOne({ slug })
+    const { id } = req.params;
+    const product = await Product.findById(id)
 
     if (!product) {
         return res.status(404).json({
