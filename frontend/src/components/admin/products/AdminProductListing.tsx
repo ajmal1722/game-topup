@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useDebounce } from "use-debounce";
 import ProductToolbar from './ProductToolbar';
 import SearchBox from '../shared/SearchBox';
 import { productsApiClient } from "@/services/products";
@@ -15,6 +16,7 @@ const AdminProductListing = ({ initialData }: { initialData: ProductsListRespons
 
     const [items, setItems] = useState<Product[]>(initialData.data);
     const [search, setSearch] = useState("");
+    const [debouncedSearch] = useDebounce(search, 900);
     const [page, setPage] = useState(initialData.page);
     const [limit, setLimit] = useState(initialData.limit);
     const [totalPages, setTotalPages] = useState(initialData.totalPages);
@@ -42,8 +44,8 @@ const AdminProductListing = ({ initialData }: { initialData: ProductsListRespons
     }, []);
 
     useEffect(() => {
-        fetchData(page, limit, search);
-    }, [page, limit, search, fetchData]);
+        fetchData(page, limit, debouncedSearch);
+    }, [page, limit, debouncedSearch, fetchData]);
 
     const handleEdit = (index: number, item: Product) => {
         router.push(`/admin/products/${item._id}`);

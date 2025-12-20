@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useDebounce } from "use-debounce";
 import { Game, GamesListResponse } from "@/lib/types/game";
 import { gamesApiClient } from "@/services/games";
 import { toast } from 'react-toastify'
@@ -15,6 +16,8 @@ const AdminGamePage = ({ initialData }: { initialData: GamesListResponse }) => {
 
     const [items, setItems] = useState<Game[]>(initialData.data);
     const [search, setSearch] = useState("");
+    const [debouncedSearch] = useDebounce(search, 900);
+
     const [page, setPage] = useState(initialData.page);
     const [limit, setLimit] = useState(initialData.limit);
     const [totalPages, setTotalPages] = useState(initialData.totalPages);
@@ -43,9 +46,8 @@ const AdminGamePage = ({ initialData }: { initialData: GamesListResponse }) => {
 
     // Effect for search, page or limit changes
     useEffect(() => {
-        // Debounce search? For now just trigger
-        fetchData(page, limit, search);
-    }, [page, limit, search, fetchData]);
+        fetchData(page, limit, debouncedSearch);
+    }, [page, limit, debouncedSearch, fetchData]);
 
     /** EDIT */
     const handleEdit = (index: number, item: Game) => {
