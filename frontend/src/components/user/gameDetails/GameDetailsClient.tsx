@@ -13,21 +13,37 @@ import UserDetailsForm from "./UserDetailsForm";
 
 export default function GameDetailsClient({ gameDetails }: { gameDetails: GameWithProducts }) {
     const [activeTab, setActiveTab] = useState("products");
-    const [selectedProduct, setSelectedProduct] = useState<any>(null);
+    const [userDetails, setUserDetails] = useState<Record<string, string>>({});
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [qty, setQty] = useState(1);
 
     const updateQty = (change: number) => {
         setQty((prev) => Math.max(1, prev + change));
     };
 
+    const updateUserDetails = (key: string, value: string) => {
+        setUserDetails((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
+    };
+
+    const handleProceedToCheckout = () => {
+        console.log("Checkout Data:", {
+            product: selectedProduct,
+            quantity: qty,
+            userDetails,
+        });
+    };
+
     return (
         <div className="text-white max-w-7xl mx-auto py-16">
 
             {/* ---------------- Hero Section ---------------- */}
-            <HeroHeader  
+            <HeroHeader
                 imageUrl={gameDetails.imageUrl || ""}
                 title={gameDetails.name}
-                // subtitle={gameDetails.}
+            // subtitle={gameDetails.}
             />
 
             {/* ---------------- Tabs ---------------- */}
@@ -59,11 +75,13 @@ export default function GameDetailsClient({ gameDetails }: { gameDetails: GameWi
 
                     <UserDetailsForm
                         fields={gameDetails.requiredFields || []}
+                        value={userDetails}
+                        onChange={updateUserDetails}
                     />
 
                     {/* Checkout Box */}
                     {selectedProduct && (
-                        <CheckoutCard product={selectedProduct} qty={qty} updateQty={updateQty} />
+                        <CheckoutCard product={selectedProduct} qty={qty} updateQty={updateQty} onProceed={handleProceedToCheckout} />
                     )}
                 </aside>
             </div>
