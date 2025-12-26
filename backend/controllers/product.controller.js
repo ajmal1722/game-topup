@@ -49,7 +49,8 @@ const createProduct = asyncHandler(async (req, res) => {
     }
 
     // 5. Validate discountedPrice
-    if (discountedPrice > price) {
+    if (discountedPrice * 1 > price * 1) {
+        console.log("discountedPrice cannot be greater than price:", discountedPrice * 1, price);
         return res.status(400).json({
             success: false,
             message: "discountedPrice cannot be greater than price",

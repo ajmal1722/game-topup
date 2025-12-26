@@ -28,7 +28,7 @@ export interface ProductPayload {
     gameId: string;
 
     name: string;
-    slug: string;
+    slug?: string;
 
     description?: string;
     image?: File | string | null;

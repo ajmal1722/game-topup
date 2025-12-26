@@ -13,6 +13,9 @@ import Input from "@/components/form/Input";
 import ImageUploader from "@/components/form/ImageUploader";
 import StatusToggle from "@/components/form/StatusToggle";
 import Textarea from "@/components/form/TextArea";
+import FilterDropdown from "@/components/admin/shared/FilterDropdown";
+import { gamesApiClient, Game } from "@/services/games";
+import { useState } from "react";
 
 interface ProductFormProps {
     productId: string;
@@ -20,6 +23,7 @@ interface ProductFormProps {
 
 export default function ProductForm({ productId }: ProductFormProps) {
     const isEdit = productId !== "new";
+    const [games, setGames] = useState<Game[]>([]);
 
     const {
         form,
@@ -33,7 +37,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
         {
             gameId: "",
             name: "",
-            slug: "",
             description: "",
             image: null,
             price: 0,
@@ -56,8 +59,18 @@ export default function ProductForm({ productId }: ProductFormProps) {
         }
     );
 
-    /* Load product when editing */
+    /* Load games and product data */
     useEffect(() => {
+        const fetchGames = async () => {
+            try {
+                const res = await gamesApiClient.list({ status: 'active', limit: 100 });
+                setGames(res.data);
+            } catch (error) {
+                console.error("Failed to fetch games", error);
+            }
+        };
+        fetchGames();
+
         if (!isEdit) return;
 
         (async () => {
@@ -67,7 +80,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
                 updateForm({
                     gameId: product.gameId,
                     name: product.name,
-                    slug: product.slug,
                     description: product.description ?? "",
                     image: product.imageUrl ?? null,
                     price: product.price,
@@ -98,10 +110,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
 
         if (!form.name?.trim()) {
             updateError("name", "Product name is required");
-            isValid = false;
-        }
-        if (!form.slug?.trim()) {
-            updateError("slug", "Slug is required");
             isValid = false;
         }
         if (!form.gameId) {
@@ -138,7 +146,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
             const payload: ProductPayload = {
                 gameId: formData.gameId,
                 name: formData.name,
-                slug: formData.slug,
                 description: formData.description,
                 price: formData.price,
                 discountedPrice: formData.discountedPrice,
@@ -179,7 +186,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                     }}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                     <Input
                         label="Product Name"
                         value={form.name}
@@ -190,33 +197,20 @@ export default function ProductForm({ productId }: ProductFormProps) {
                             clearError("name");
                         }}
                     />
-
-                    <Input
-                        label="Slug"
-                        value={form.slug}
-                        error={errors.slug}
-                        required
-                        onChange={(e) => {
-                            updateForm({
-                                slug: e.target.value
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-"),
-                            });
-                            clearError("slug");
-                        }}
-                    />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Input
-                        label="Game ID"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <FilterDropdown
+                        label="Select Game"
+                        options={games.map(g => ({ label: g.name, value: g._id }))}
                         value={form.gameId}
                         error={errors.gameId}
-                        required
-                        onChange={(e) => {
-                            updateForm({ gameId: e.target.value });
+                        onChange={(val) => {
+                            updateForm({ gameId: val });
                             clearError("gameId");
                         }}
+                        placeholder="Choose a game..."
+                        className="w-full"
                     />
 
                     <Input
