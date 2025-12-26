@@ -217,6 +217,10 @@ const getProducts = asyncHandler(async (req, res) => {
         ];
     }
 
+    if (req.query.gameId) {
+        query.gameId = req.query.gameId;
+    }
+
     const sortQuery = {
         [sort]: order === "asc" ? 1 : -1
     };

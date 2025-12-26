@@ -10,6 +10,8 @@ import { Product, ProductsListResponse } from '@/lib/types/product';
 import ProductTable from "./ProductTable";
 import { toast } from "react-toastify";
 import Pagination from "../shared/Pagination";
+import FilterDropdown from "../shared/FilterDropdown";
+import { gamesApiClient, Game } from "@/services/games";
 
 const AdminProductListing = ({ initialData }: { initialData: ProductsListResponse }) => {
     const router = useRouter();
@@ -22,15 +24,18 @@ const AdminProductListing = ({ initialData }: { initialData: ProductsListRespons
     const [totalPages, setTotalPages] = useState(initialData.totalPages);
     const [totalItems, setTotalItems] = useState(initialData.total);
     const [loading, setLoading] = useState(false);
+    const [games, setGames] = useState<Game[]>([]);
+    const [selectedGameId, setSelectedGameId] = useState("");
 
     /** FETCH DATA */
-    const fetchData = useCallback(async (p: number, l: number, s: string) => {
+    const fetchData = useCallback(async (p: number, l: number, s: string, g: string) => {
         setLoading(true);
         try {
             const res = await productsApiClient.list({
                 page: p,
                 limit: l,
-                search: s
+                search: s,
+                gameId: g
             });
             setItems(res.data);
             setTotalPages(res.totalPages);
@@ -44,8 +49,20 @@ const AdminProductListing = ({ initialData }: { initialData: ProductsListRespons
     }, []);
 
     useEffect(() => {
-        fetchData(page, limit, debouncedSearch);
-    }, [page, limit, debouncedSearch, fetchData]);
+        fetchData(page, limit, debouncedSearch, selectedGameId);
+    }, [page, limit, debouncedSearch, selectedGameId, fetchData]);
+
+    useEffect(() => {
+        const fetchGames = async () => {
+            try {
+                const res = await gamesApiClient.list({ status: 'active', limit: 100 });
+                setGames(res.data);
+            } catch (error) {
+                console.error("Failed to fetch games", error);
+            }
+        };
+        fetchGames();
+    }, []);
 
     const handleEdit = (index: number, item: Product) => {
         router.push(`/admin/products/${item._id}`);
@@ -77,6 +94,18 @@ const AdminProductListing = ({ initialData }: { initialData: ProductsListRespons
                             setPage(1);
                         }}
                         placeholder="Search products..."
+                    />
+                </div>
+                <div className="flex items-center gap-2">
+                    <FilterDropdown
+                        options={games.map(g => ({ label: g.name, value: g._id }))}
+                        value={selectedGameId}
+                        onChange={(val) => {
+                            setSelectedGameId(val);
+                            setPage(1);
+                        }}
+                        placeholder="Filter by Game: All"
+                        className="w-full md:w-72"
                     />
                 </div>
             </div>
