@@ -44,8 +44,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
             deliveryTime: "Instant Delivery",
             status: "active",
             isPopular: false,
-            metaTitle: "",
-            metaDescription: "",
             imageFile: null,
         },
         {
@@ -87,8 +85,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
                     deliveryTime: product.deliveryTime ?? "Instant Delivery",
                     status: product.status,
                     isPopular: product.isPopular ?? false,
-                    metaTitle: product.metaTitle ?? "",
-                    metaDescription: product.metaDescription ?? "",
                     imageFile: null,
                 });
             } catch (err) {
@@ -152,8 +148,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
                 deliveryTime: formData.deliveryTime,
                 status: formData.status,
                 isPopular: formData.isPopular,
-                metaTitle: formData.metaTitle,
-                metaDescription: formData.metaDescription,
                 image: (formData.imageFile as File) ?? null,
             };
 
@@ -286,27 +280,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
                         </label>
                     </div>
                 </div>
-            </FormSection>
-
-            {/* SEO Settings */}
-            <FormSection title="SEO Settings" divider={false}>
-                <Input
-                    label="Meta Title"
-                    value={form.metaTitle}
-                    onChange={(e) =>
-                        updateForm({ metaTitle: e.target.value })
-                    }
-                    placeholder="SEO Title"
-                />
-
-                <Textarea
-                    label="Meta Description"
-                    value={form.metaDescription}
-                    onChange={(e) =>
-                        updateForm({ metaDescription: e.target.value })
-                    }
-                    placeholder="SEO Description"
-                />
             </FormSection>
         </FormWrapper>
     );

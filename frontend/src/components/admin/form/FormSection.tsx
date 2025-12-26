@@ -17,6 +17,7 @@ export default function FormSection({
 }: FormSectionProps) {
     return (
         <>
+            {divider && <hr className="border-gray-200" />}
             <div className="space-y-4">
                 {title && (
                     <div>
@@ -32,7 +33,6 @@ export default function FormSection({
                 )}
                 <div className="space-y-4">{children}</div>
             </div>
-            {divider && <hr className="border-gray-200" />}
         </>
     );
 }

@@ -155,7 +155,7 @@ const getGameDetails = asyncHandler(async (req, res) => {
 // @route   POST /api/games
 // @access  Admin
 const createGame = asyncHandler(async (req, res) => {
-    const { name, description, status } = req.body;
+    const { name, description, status, metaTitle, metaDescription } = req.body;
     console.log('cate;', req.body.category);
 
     // 1. Parse & Validate requiredFields
@@ -283,6 +283,8 @@ const createGame = asyncHandler(async (req, res) => {
             description: description?.trim() || "",
             requiredFields: requiredFields || [],
             status: status === "inactive" ? "inactive" : "active",
+            metaTitle: metaTitle || "",
+            metaDescription: metaDescription || "",
         });
     } catch (err) {
         // Cleanup orphaned Cloudinary image
@@ -301,7 +303,7 @@ const createGame = asyncHandler(async (req, res) => {
 });
 
 const updateGame = asyncHandler(async (req, res) => {
-    const { name, description, status } = req.body;
+    const { name, description, status, metaTitle, metaDescription } = req.body;
     const category = req.body.category?.trim().toLowerCase();
 
     // 1. Fetch existing game
@@ -416,6 +418,8 @@ const updateGame = asyncHandler(async (req, res) => {
     game.category = category ?? game.category;
     game.description = description ?? game.description;
     game.status = status ?? game.status;
+    game.metaTitle = metaTitle ?? game.metaTitle;
+    game.metaDescription = metaDescription ?? game.metaDescription;
 
     if (requiredFields) {
         game.requiredFields = requiredFields;

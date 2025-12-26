@@ -23,6 +23,8 @@ export type Game = {
     description: string;
     requiredFields: RequiredField[];
     status: "active" | "inactive";
+    metaTitle?: string;
+    metaDescription?: string;
 };
 
 export type GamesListResponse = {

@@ -41,6 +41,8 @@ export default function GameForm({ gameId }: Props) {
             imageUrl: null,
             status: "active",
             requiredFields: [],
+            metaTitle: "",
+            metaDescription: "",
             imageFile: null,
         },
         {
@@ -111,6 +113,8 @@ export default function GameForm({ gameId }: Props) {
                 description: formData.description,
                 status: formData.status,
                 requiredFields: formData.requiredFields,
+                metaTitle: formData.metaTitle,
+                metaDescription: formData.metaDescription,
                 image: (formData.imageFile as File) ?? null,
             };
 
@@ -201,6 +205,23 @@ export default function GameForm({ gameId }: Props) {
                         updateForm({ requiredFields: fields })
                     }
                     errors={Array.isArray(errors.requiredFields) ? (errors.requiredFields as any) : undefined}
+                />
+            </FormSection>
+
+            {/* SEO Settings Section */}
+            <FormSection title="SEO Settings">
+                <Input
+                    label="Meta Title"
+                    placeholder="SEO Title"
+                    value={form.metaTitle}
+                    onChange={(e) => updateForm({ metaTitle: e.target.value })}
+                />
+
+                <Textarea
+                    label="Meta Description"
+                    placeholder="SEO Description"
+                    value={form.metaDescription}
+                    onChange={(e) => updateForm({ metaDescription: e.target.value })}
                 />
             </FormSection>
         </FormWrapper>

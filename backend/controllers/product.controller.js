@@ -15,8 +15,6 @@ const createProduct = asyncHandler(async (req, res) => {
         deliveryTime,
         status,
         isPopular,
-        metaTitle,
-        metaDescription,
     } = req.body;
 
     // 1. Required fields
@@ -77,8 +75,6 @@ const createProduct = asyncHandler(async (req, res) => {
         deliveryTime: deliveryTime || "Instant Delivery",
         status: status || "active",
         isPopular: isPopular || false,
-        metaTitle: metaTitle || "",
-        metaDescription: metaDescription || "",
     });
 
     return res.status(201).json({
@@ -106,8 +102,6 @@ const updateProduct = asyncHandler(async (req, res) => {
         deliveryTime,
         status,
         isPopular,
-        metaTitle,
-        metaDescription,
     } = req.body;
 
     // 1. Validate discountedPrice
@@ -161,8 +155,6 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.deliveryTime = deliveryTime ?? product.deliveryTime;
     product.status = status ?? product.status;
     product.isPopular = isPopular ?? product.isPopular;
-    product.metaTitle = metaTitle ?? product.metaTitle;
-    product.metaDescription = metaDescription ?? product.metaDescription;
 
     const updated = await product.save();
 
