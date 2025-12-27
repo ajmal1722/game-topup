@@ -97,7 +97,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
     /* Validation */
     const validate = (): boolean => {
         clearError("name");
-        clearError("slug");
         clearError("price");
         clearError("discountedPrice");
         clearError("gameId");
@@ -108,21 +107,25 @@ export default function ProductForm({ productId }: ProductFormProps) {
             updateError("name", "Product name is required");
             isValid = false;
         }
+
         if (!form.gameId) {
             updateError("gameId", "Game selection is required");
             isValid = false;
         }
 
-        if (form.price <= 0) {
-            updateError("price", "Price must be greater than 0");
+        const price = Number(form.price);
+        const discountedPrice = Number(form.discountedPrice);
+
+        if (isNaN(price) || price <= 0) {
+            updateError("price", "Price must be a positive number");
             isValid = false;
         }
 
-        if (form.discountedPrice < 0) {
-            updateError("discountedPrice", "Invalid discounted price");
+        if (isNaN(discountedPrice) || discountedPrice <= 0) {
+            updateError("discountedPrice", "Discounted price cannot be negative or zero");
             isValid = false;
-        } else if (form.discountedPrice > form.price) {
-            updateError("discountedPrice", "Discount cannot exceed price");
+        } else if (discountedPrice > price) {
+            updateError("discountedPrice", "Discounted price cannot exceed the original price");
             isValid = false;
         }
 

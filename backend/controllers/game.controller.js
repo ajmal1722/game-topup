@@ -156,7 +156,6 @@ const getGameDetails = asyncHandler(async (req, res) => {
 // @access  Admin
 const createGame = asyncHandler(async (req, res) => {
     const { name, description, status, metaTitle, metaDescription } = req.body;
-    console.log('cate;', req.body.category);
 
     // 1. Parse & Validate requiredFields
     let requiredFields = req.body.requiredFields;

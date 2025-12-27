@@ -25,6 +25,13 @@ const createProduct = asyncHandler(async (req, res) => {
         });
     }
 
+    if (!req.file) {
+        return res.status(400).json({
+            success: false,
+            message: "Image is required",
+        });
+    }
+
     // 2. Validate game exists
     const game = await Game.findById(gameId);
     if (!game) {
