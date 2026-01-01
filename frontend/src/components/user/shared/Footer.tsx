@@ -48,7 +48,7 @@ const Footer = () => {
                             <FooterLink href="/" label="Home" />
                             <FooterLink href="/categories" label="Games Catalog" />
                             <FooterLink href="/blogs" label="Latest News" />
-                            <FooterLink href="/about" label="About Us" />
+                            {/* <FooterLink href="/about" label="About Us" /> */}
                         </ul>
                     </div>
 
@@ -58,9 +58,6 @@ const Footer = () => {
                         <ul className="space-y-4">
                             <FooterLink href="/faq" label="Help Center / FAQ" />
                             <FooterLink href="/contact" label="Contact Support" />
-                            <FooterLink href="/terms" label="Terms of Service" />
-                            <FooterLink href="/privacy" label="Privacy Policy" />
-                            <FooterLink href="/refund" label="Refund Policy" />
                         </ul>
                     </div>
 
@@ -68,7 +65,7 @@ const Footer = () => {
                     <div className="space-y-6">
                         <h3 className="text-white font-bold mb-6 text-lg">Get in Touch</h3>
                         <div className="space-y-4">
-                            <ContactItem icon={<RiMailLine />} text="support@gametopup.com" />
+                            <ContactItem icon={<RiMailLine />} text="support@topupio.com" />
                             <ContactItem icon={<RiPhoneLine />} text="+1 (555) 000-0000" />
                             <ContactItem icon={<RiMapPinLine />} text="Gaming Street, Silicon Valley, CA" />
                         </div>
@@ -88,11 +85,11 @@ const Footer = () => {
 
                 {/* Bottom Bar */}
                 <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-                    <p>© {new Date().getFullYear()} GameTopup. All rights reserved.</p>
+                    <p>© {new Date().getFullYear()} TopUpIO. All rights reserved.</p>
                     <div className="flex gap-8">
-                        <Link href="/terms" className="hover:text-white transition">Terms</Link>
-                        <Link href="/privacy" className="hover:text-white transition">Privacy</Link>
-                        <Link href="/cookies" className="hover:text-white transition">Cookies</Link>
+                        <Link href="/terms-and-conditions" className="hover:text-white transition">Terms</Link>
+                        <Link href="/privacy-policy" className="hover:text-white transition">Privacy</Link>
+                        <Link href="/refund-policy" className="hover:text-white transition">Refunds</Link>
                     </div>
                 </div>
             </div>
