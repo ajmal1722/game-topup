@@ -3,6 +3,7 @@ import { asyncHandler } from "../middlewares/asyncHandler.js";
 import slugify from "slugify";
 import { uploadBufferToCloudinary } from "../utils/uploadToCloudinary.js";
 import { deleteImageFromCloudinary } from "../utils/deleteFromCloudinary.js";
+import { logAdminActivity } from "../utils/adminLogger.js";
 
 const getGames = asyncHandler(async (req, res) => {
     const {
@@ -300,6 +301,14 @@ const createGame = asyncHandler(async (req, res) => {
         throw err;
     }
 
+    logAdminActivity(req, {
+        action: "CREATE",
+        module: "games",
+        targetId: newGame._id,
+        targetModel: "Game",
+        description: `Created new game: ${newGame.name}`
+    });
+
     return res.status(201).json({
         success: true,
         message: "Game created successfully",
@@ -437,6 +446,14 @@ const updateGame = asyncHandler(async (req, res) => {
     // 7. Save Game
     const updatedGame = await game.save();
 
+    logAdminActivity(req, {
+        action: "UPDATE",
+        module: "games",
+        targetId: updatedGame._id,
+        targetModel: "Game",
+        description: `Updated game: ${updatedGame.name}`
+    });
+
     return res.status(200).json({
         success: true,
         message: "Game updated successfully",
@@ -468,6 +485,14 @@ const deleteGame = asyncHandler(async (req, res) => {
 
     // 3. Delete Game Document
     await Game.findByIdAndDelete(id);
+
+    logAdminActivity(req, {
+        action: "DELETE",
+        module: "games",
+        targetId: id,
+        targetModel: "Game",
+        description: `Deleted game: ${game.name}`
+    });
 
     return res.status(200).json({
         success: true,
