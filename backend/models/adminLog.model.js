@@ -70,4 +70,8 @@ adminActivityLogSchema.index({ module: 1, createdAt: -1 });
 adminActivityLogSchema.index({ action: 1, createdAt: -1 });
 adminActivityLogSchema.index({ targetId: 1 });
 
+// TTL Index: Automatically delete logs older than 30 days (30 * 24 * 60 * 60 = 2592000 seconds)
+const LOG_RETENTION_DAYS = 30;
+adminActivityLogSchema.index({ createdAt: 1 }, { expireAfterSeconds: LOG_RETENTION_DAYS * 24 * 60 * 60 });
+
 export default mongoose.model("AdminActivityLog", adminActivityLogSchema);
