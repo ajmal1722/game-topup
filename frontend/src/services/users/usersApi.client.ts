@@ -5,8 +5,8 @@ import { endpoints } from "@/config/api";
 import { UserResponse, UserParams, User } from "./types";
 
 export const usersApiClient = {
-    async list(params?: UserParams): Promise<UserResponse> {
-        const { data } = await clientApi.get(endpoints.admin.users, { params: params as any });
+    async list(params?: UserParams, signal?: AbortSignal): Promise<UserResponse> {
+        const { data } = await clientApi.get(endpoints.admin.users, { params: params as any, signal });
         return data;
     },
 

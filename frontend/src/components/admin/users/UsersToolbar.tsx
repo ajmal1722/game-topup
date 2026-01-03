@@ -1,45 +1,22 @@
-"use client";
-
-import { useState, useEffect } from "react";
+// stateless component
 import { TbSearch, TbX, TbUserShield, TbLock, TbShieldCheck } from "react-icons/tb";
 
 interface Props {
-    onFilterChange: (filters: {
-        search?: string;
-        role?: string;
-        status?: string;
-        verified?: string;
-    }) => void;
+    filters: {
+        search: string;
+        role: string;
+        status: string;
+        verified: string;
+    };
+    onFilterChange: (key: string, value: string) => void;
+    onClearFilters: () => void;
 }
 
-export default function UsersToolbar({ onFilterChange }: Props) {
-    const [search, setSearch] = useState("");
-    const [role, setRole] = useState("");
-    const [status, setStatus] = useState("");
-    const [verified, setVerified] = useState("");
+export default function UsersToolbar({ filters, onFilterChange, onClearFilters }: Props) {
+    const { search, role, status, verified } = filters;
 
-    // Debounce effect for search & filters
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            onFilterChange({
-                search: search || undefined,
-                role: role || undefined,
-                status: status || undefined,
-                verified: verified || undefined,
-            });
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [search, role, status, verified, onFilterChange]);
-
-    const clearFilters = () => {
-        setSearch("");
-        setRole("");
-        setStatus("");
-        setVerified("");
-    };
-
-    const hasFilters = search || role || status || verified;
+    // Check if any filter is active
+    const hasFilters = search !== "" || role !== "" || status !== "" || verified !== "";
 
     return (
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100/80 mb-6">
@@ -51,7 +28,7 @@ export default function UsersToolbar({ onFilterChange }: Props) {
                     <input
                         type="text"
                         value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => onFilterChange("search", e.target.value)}
                         placeholder="Search users by name or email..."
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition outline-none"
                     />
@@ -65,7 +42,7 @@ export default function UsersToolbar({ onFilterChange }: Props) {
                         <TbUserShield className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors" size={18} />
                         <select
                             value={role}
-                            onChange={(e) => setRole(e.target.value)}
+                            onChange={(e) => onFilterChange("role", e.target.value)}
                             className="pl-10 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50/50 hover:bg-white hover:border-blue-300 transition focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none appearance-none cursor-pointer min-w-[140px]"
                         >
                             <option value="">All Roles</option>
@@ -79,7 +56,7 @@ export default function UsersToolbar({ onFilterChange }: Props) {
                         <TbLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors" size={18} />
                         <select
                             value={status}
-                            onChange={(e) => setStatus(e.target.value)}
+                            onChange={(e) => onFilterChange("status", e.target.value)}
                             className="pl-10 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50/50 hover:bg-white hover:border-blue-300 transition focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none appearance-none cursor-pointer min-w-[140px]"
                         >
                             <option value="">All Statuses</option>
@@ -93,7 +70,7 @@ export default function UsersToolbar({ onFilterChange }: Props) {
                         <TbShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors" size={18} />
                         <select
                             value={verified}
-                            onChange={(e) => setVerified(e.target.value)}
+                            onChange={(e) => onFilterChange("verified", e.target.value)}
                             className="pl-10 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50/50 hover:bg-white hover:border-blue-300 transition focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none appearance-none cursor-pointer min-w-[140px]"
                         >
                             <option value="">All Verification</option>
@@ -104,7 +81,7 @@ export default function UsersToolbar({ onFilterChange }: Props) {
 
                     {/* Clear Button */}
                     <button
-                        onClick={clearFilters}
+                        onClick={onClearFilters}
                         disabled={!hasFilters}
                         className={`
                             ml-2 p-2.5 rounded-xl border transition-all duration-200 flex items-center gap-2 text-sm font-medium cursor-pointer
