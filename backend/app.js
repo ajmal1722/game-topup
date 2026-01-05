@@ -11,6 +11,7 @@ import productRouter from './routes/product.routes.js';
 import internalRouter from './routes/internal.routes.js';
 import bannerRouter from './routes/banner.routes.js';
 import blogRouter from './routes/blog.routes.js';
+import orderRouter from './routes/order.routes.js';
 
 // Create and configure the Express app
 const app = express();
@@ -47,6 +48,7 @@ app.use('/api/games', gameRouter);
 app.use('/api/products', productRouter);
 app.use('/api/banners', bannerRouter);
 app.use('/api/blogs', blogRouter);
+app.use('/api/orders', orderRouter);
 
 // Root route
 app.get('/', (req, res) => {

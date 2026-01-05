@@ -41,8 +41,8 @@ const orderSchema = new mongoose.Schema(
 
         paymentMethod: {
             type: String,
-            enum: ["razorpay", "stripe", "paypal", "wallet", "cod"],
-            default: "razorpay",
+            enum: ["razorpay", "stripe", "wallet", "binancePay"],
+            default: "binancePay",
         },
 
         paymentInfo: {
@@ -53,7 +53,6 @@ const orderSchema = new mongoose.Schema(
         // Required fields collected from UI (like email, playerId, server)
         userInputs: [
             {
-                key: { type: String, required: true }, // "playerId"
                 label: { type: String, required: true }, // "Player ID"
                 value: { type: mongoose.Schema.Types.Mixed, required: true },
             },
@@ -80,8 +79,28 @@ const orderSchema = new mongoose.Schema(
         completionProof: {
             type: String, // screenshot URL or attachment
         },
+
+        productSnapshot: {
+            name: String,
+            price: Number,
+            discountedPrice: Number,
+            deliveryTime: String
+        },
+
+        tracking: [
+            {
+                status: String,        // e.g., "processing", "completed"
+                message: String,       // "Top-up started", "Delivered successfully"
+                at: { type: Date, default: Date.now }
+            }
+        ]
     },
     { timestamps: true }
 );
+
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ orderStatus: 1, createdAt: -1 });
+orderSchema.index({ paymentStatus: 1 });
+orderSchema.index({ orderId: 1 });
 
 export default mongoose.model("Order", orderSchema);

@@ -2,7 +2,7 @@
 
 import { RiAddLine, RiSubtractLine } from "react-icons/ri";
 
-export default function CheckoutCard({ product, qty, updateQty, onProceed }: any) {
+export default function CheckoutCard({ product, qty, updateQty, onProceed, isLoading }: any) {
     const price = product.price;
     const discountedPrice = product.discountedPrice ?? product.price;
 
@@ -36,13 +36,13 @@ export default function CheckoutCard({ product, qty, updateQty, onProceed }: any
 
                     <div className="flex items-center gap-3 bg-white/10 px-3 py-2 rounded-xl">
                         <RiSubtractLine
-                            className="cursor-pointer text-tertiary"
-                            onClick={() => updateQty(-1)}
+                            className={`cursor-pointer text-tertiary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            onClick={() => !isLoading && updateQty(-1)}
                         />
                         <span className="text-white font-semibold">{qty}</span>
                         <RiAddLine
-                            className="cursor-pointer text-tertiary"
-                            onClick={() => updateQty(1)}
+                            className={`cursor-pointer text-tertiary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            onClick={() => !isLoading && updateQty(1)}
                         />
                     </div>
                 </div>
@@ -58,9 +58,17 @@ export default function CheckoutCard({ product, qty, updateQty, onProceed }: any
 
                 <button
                     onClick={onProceed}
-                    className="w-full mt-6 py-3 rounded-xl bg-secondary hover:text-gray-950 font-semibold hover:bg-tertiary transition"
+                    disabled={isLoading}
+                    className="w-full mt-6 py-3 rounded-xl bg-secondary hover:text-gray-950 font-semibold hover:bg-tertiary transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                    Proceed to Checkout
+                    {isLoading ? (
+                        <>
+                            <span className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+                            Processing...
+                        </>
+                    ) : (
+                        "Proceed to Checkout"
+                    )}
                 </button>
             </div>
         </div>

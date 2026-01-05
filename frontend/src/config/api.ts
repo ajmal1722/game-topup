@@ -38,6 +38,13 @@ export const endpoints = {
         users: "/api/admin/users",
         userStatus: (id: string) => `/api/admin/users/${id}/status`
     },
+    orders: {
+        base: "/api/orders",
+        myOrders: "/api/orders/my-orders",
+        details: (id: string) => `/api/orders/${id}`,
+        adminAll: "/api/orders/admin/all",
+        adminUpdate: (id: string) => `/api/orders/admin/${id}`,
+    },
     // add more domains here (products, orders, users, etc.)
 };
 
