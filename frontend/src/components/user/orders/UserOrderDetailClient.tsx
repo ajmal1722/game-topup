@@ -40,26 +40,44 @@ export default function UserOrderDetailClient({ order }: Props) {
 
                         {/* Order Header */}
                         <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-secondary font-bold tracking-wider uppercase">Order {order.orderId}</span>
+
+                            {/* Header */}
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+
+                                {/* Left */}
+                                <div className="space-y-1 w-full">
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
+                                        <span className="text-secondary font-bold tracking-wider uppercase text-sm">
+                                            Order {order.orderId}
+                                        </span>
+
                                         <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusStyles(order.orderStatus)}`}>
                                             {order.orderStatus.toUpperCase()}
                                         </span>
                                     </div>
-                                    <h2 className="text-2xl font-bold text-white">{order.productSnapshot?.name ?? "Product"}</h2>
+
+                                    <div className="flex justify-between mt-4">
+                                        <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">
+                                            {order.productSnapshot?.name ?? "Product"}
+                                        </h2>
+                                        <span className="text-xl sm:text-2xl font-bold text-white">
+                                            ₹{order.amount}
+                                        </span>
+                                    </div>
                                 </div>
-                                <span className="text-2xl font-bold text-white">₹{order.amount}</span>
+
+                                {/* Right */}
                             </div>
 
-                            <div className="flex flex-wrap gap-4 text-sm text-gray-400 border-t border-white/10 pt-6">
+                            {/* Meta info */}
+                            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-6 text-sm text-gray-400 border-t border-white/10 pt-5">
                                 <div className="flex items-center gap-2">
-                                    <RiTimeLine className="text-secondary" />
+                                    <RiTimeLine className="text-secondary shrink-0" />
                                     <span>Placed on: {new Date(order.createdAt).toLocaleString()}</span>
                                 </div>
+
                                 <div className="flex items-center gap-2">
-                                    <RiWallet3Line className="text-secondary" />
+                                    <RiWallet3Line className="text-secondary shrink-0" />
                                     <span>Payment: {order.paymentMethod?.toUpperCase()}</span>
                                 </div>
                             </div>
