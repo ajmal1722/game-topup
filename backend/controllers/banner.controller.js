@@ -2,6 +2,7 @@ import Banner from "../models/banner.model.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { uploadBufferToCloudinary } from "../utils/uploadToCloudinary.js";
 import { deleteImageFromCloudinary } from "../utils/deleteFromCloudinary.js";
+import { logAdminActivity } from "../utils/adminLogger.js";
 
 // @desc    Create a new banner
 // @route   POST /api/banners
@@ -24,6 +25,14 @@ export const createBanner = asyncHandler(async (req, res) => {
         order: order ? parseInt(order) : 0,
         imageUrl: upload.secure_url,
         imagePublicId: upload.public_id,
+    });
+
+    logAdminActivity(req, {
+        action: "CREATE",
+        module: "banners",
+        targetId: banner._id,
+        targetModel: "Banner",
+        description: `Created new banner: ${banner.title || "Untitled"}`
     });
 
     res.status(201).json({
@@ -120,6 +129,16 @@ export const updateBanner = asyncHandler(async (req, res) => {
         { new: true }
     );
 
+    if (updatedBanner) {
+        logAdminActivity(req, {
+            action: "UPDATE",
+            module: "banners",
+            targetId: updatedBanner._id,
+            targetModel: "Banner",
+            description: `Updated banner: ${updatedBanner.title || "Untitled"}`
+        });
+    }
+
     if (!updatedBanner) {
         res.status(404);
         throw new Error("Banner not found");
@@ -148,6 +167,14 @@ export const deleteBanner = asyncHandler(async (req, res) => {
     const deleteBannerPromise = Banner.findByIdAndDelete(req.params.id);
 
     await Promise.all([deleteImagePromise, deleteBannerPromise]);
+
+    logAdminActivity(req, {
+        action: "DELETE",
+        module: "banners",
+        targetId: req.params.id,
+        targetModel: "Banner",
+        description: `Deleted banner`
+    });
 
     res.status(200).json({
         success: true,

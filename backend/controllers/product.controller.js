@@ -4,6 +4,7 @@ import slugify from "slugify";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { uploadBufferToCloudinary } from "../utils/uploadToCloudinary.js";
 import { deleteImageFromCloudinary } from "../utils/deleteFromCloudinary.js";
+import { logAdminActivity } from "../utils/adminLogger.js";
 
 const createProduct = asyncHandler(async (req, res) => {
     const {
@@ -82,6 +83,14 @@ const createProduct = asyncHandler(async (req, res) => {
         deliveryTime: deliveryTime || "Instant Delivery",
         status: status || "active",
         isPopular: isPopular || false,
+    });
+
+    logAdminActivity(req, {
+        action: "CREATE",
+        module: "products",
+        targetId: product._id,
+        targetModel: "Product",
+        description: `Created product: ${product.name} for game: ${game.name}`
     });
 
     return res.status(201).json({
@@ -165,6 +174,14 @@ const updateProduct = asyncHandler(async (req, res) => {
 
     const updated = await product.save();
 
+    logAdminActivity(req, {
+        action: "UPDATE",
+        module: "products",
+        targetId: updated._id,
+        targetModel: "Product",
+        description: `Updated product: ${updated.name}`
+    });
+
     return res.status(200).json({
         success: true,
         message: "Product updated successfully",
@@ -187,6 +204,14 @@ const deleteProduct = asyncHandler(async (req, res) => {
     }
 
     await product.deleteOne();
+
+    logAdminActivity(req, {
+        action: "DELETE",
+        module: "products",
+        targetId: product._id,
+        targetModel: "Product",
+        description: `Deleted product: ${product.name}`
+    });
 
     return res.status(200).json({
         success: true,

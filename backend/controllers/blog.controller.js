@@ -4,6 +4,7 @@ import { uploadBufferToCloudinary } from "../utils/uploadToCloudinary.js";
 import { deleteImageFromCloudinary } from "../utils/deleteFromCloudinary.js";
 import mongoose from "mongoose";
 import slugify from "slugify";
+import { logAdminActivity } from "../utils/adminLogger.js";
 
 // @desc    Create a new blog
 // @route   POST /api/blogs
@@ -60,6 +61,14 @@ export const createBlog = asyncHandler(async (req, res) => {
         coverImage: upload.secure_url,
         coverImageId: upload.public_id,
         seo
+    });
+
+    logAdminActivity(req, {
+        action: "CREATE",
+        module: "blogs",
+        targetId: blog._id,
+        targetModel: "Blog",
+        description: `Created blog: ${blog.title}`
     });
 
     res.status(201).json({
@@ -194,6 +203,14 @@ export const updateBlog = asyncHandler(async (req, res) => {
 
     const updatedBlog = await blog.save();
 
+    logAdminActivity(req, {
+        action: "UPDATE",
+        module: "blogs",
+        targetId: updatedBlog._id,
+        targetModel: "Blog",
+        description: `Updated blog: ${updatedBlog.title}`
+    });
+
     res.status(200).json({
         success: true,
         data: updatedBlog
@@ -217,6 +234,14 @@ export const deleteBlog = asyncHandler(async (req, res) => {
     }
 
     await blog.deleteOne();
+
+    logAdminActivity(req, {
+        action: "DELETE",
+        module: "blogs",
+        targetId: blog._id,
+        targetModel: "Blog",
+        description: `Deleted blog: ${blog.title}`
+    });
 
     res.status(200).json({
         success: true,

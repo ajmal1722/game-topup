@@ -15,10 +15,10 @@ const paymentSchema = new mongoose.Schema(
             required: true,
         },
 
-        // Razorpay / Stripe / PayPal / Wallet etc.
+        // Razorpay / Stripe / Wallet etc.
         paymentGateway: {
             type: String,
-            enum: ["razorpay", "stripe", "paypal", "wallet"],
+            enum: ["razorpay", "stripe", "wallet", "binancePay"],
             required: true,
         },
 
@@ -37,7 +37,7 @@ const paymentSchema = new mongoose.Schema(
 
         currency: {
             type: String,
-            default: "INR",
+            default: "USD",
         },
 
         // UPI / Card / Netbanking / Wallet etc.
@@ -75,5 +75,8 @@ const paymentSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+paymentSchema.index({ order: 1 });
+paymentSchema.index({ transactionId: 1 });
 
 export default mongoose.model("Payment", paymentSchema);

@@ -4,7 +4,7 @@ const adminActivityLogSchema = new mongoose.Schema(
     {
         admin: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User", // admin & user share same user schema
+            ref: "User",
             required: true,
         },
 
@@ -16,23 +16,23 @@ const adminActivityLogSchema = new mongoose.Schema(
         // What module this action belongs to
         module: {
             type: String,
+            required: true,
             enum: [
+                "dashboard",
                 "users",
+                "banners",
                 "games",
                 "products",
+                "blogs",
                 "orders",
                 "payments",
-                "coupons",
-                "categories",
-                "dashboard",
                 "settings",
-                "support",
                 "other",
             ],
             default: "other",
         },
 
-        // Store old and new values (optional but powerful)
+        // Store old and new values for audit trail
         changes: {
             type: Object,
             default: {},
@@ -48,19 +48,30 @@ const adminActivityLogSchema = new mongoose.Schema(
             type: String, // e.g., "Order", "Product"
         },
 
-        ipAddress: {
+        description: {
+            type: String,
+        },
+
+        // Forensic & Security Fields
+        ip: {
             type: String,
         },
 
         userAgent: {
             type: String,
         },
-
-        description: {
-            type: String,
-        },
     },
     { timestamps: true }
 );
+
+// Indexing for faster queries
+adminActivityLogSchema.index({ admin: 1, createdAt: -1 });
+adminActivityLogSchema.index({ module: 1, createdAt: -1 });
+adminActivityLogSchema.index({ action: 1, createdAt: -1 });
+adminActivityLogSchema.index({ targetId: 1 });
+
+// TTL Index: Automatically delete logs older than 30 days (30 * 24 * 60 * 60 = 2592000 seconds)
+const LOG_RETENTION_DAYS = 30;
+adminActivityLogSchema.index({ createdAt: 1 }, { expireAfterSeconds: LOG_RETENTION_DAYS * 24 * 60 * 60 });
 
 export default mongoose.model("AdminActivityLog", adminActivityLogSchema);

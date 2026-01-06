@@ -10,6 +10,9 @@ import CheckoutCard from "./CheckoutCard";
 import OverviewTab from "./OverviewTab";
 import HowToTab from "./HowToTab";
 import UserDetailsForm from "./UserDetailsForm";
+import { ordersApiClient } from "@/services/orders/ordersApi.client";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function GameDetailsClient({ gameDetails }: { gameDetails: GameWithProducts }) {
     const [activeTab, setActiveTab] = useState("products");
@@ -17,9 +20,16 @@ export default function GameDetailsClient({ gameDetails }: { gameDetails: GameWi
     const [userDetails, setUserDetails] = useState<Record<string, string>>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [qty, setQty] = useState(1);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
 
     const updateQty = (change: number) => {
-        setQty((prev) => Math.max(1, prev + change));
+        setQty((prev) => {
+            const next = prev + change;
+            if (next < 1) return 1;
+            if (next > 99) return 99;
+            return next;
+        });
     };
 
     const updateUserDetails = (key: string, value: string) => {
@@ -57,17 +67,53 @@ export default function GameDetailsClient({ gameDetails }: { gameDetails: GameWi
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleProceedToCheckout = () => {
+    const handleProceedToCheckout = async () => {
         if (!validateFields()) {
-            console.log("Validation failed");
+            toast.error("Please fill all required fields correctly");
             return;
         }
 
-        console.log("Checkout Data:", {
-            product: selectedProduct,
-            quantity: qty,
-            userDetails,
-        });
+        if (!selectedProduct) return;
+
+        setIsSubmitting(true);
+        try {
+            // Map userDetails map to the array expected by backend
+            const inputs = gameDetails.requiredFields?.map(field => ({
+                label: field.fieldName,
+                value: userDetails[field.fieldKey]
+            })) || [];
+
+            const discountedPrice = selectedProduct.discountedPrice ?? selectedProduct.price;
+
+            const productSnapshot = {
+                name: selectedProduct.name,
+                price: selectedProduct.price,
+                discountedPrice,
+                deliveryTime: selectedProduct.deliveryTime,
+                qty,
+                totalAmount: discountedPrice * qty,
+            };
+
+            const res = await ordersApiClient.create({
+                gameId: gameDetails._id,
+                productId: selectedProduct._id,
+                qty,
+                userInputs: inputs,
+                // @ts-ignore
+                productSnapshot
+            });
+
+            if (res.success) {
+                toast.success("Order placed successfully!");
+                // Redirect to orders page or a success page
+                router.push(`/orders/${res.data._id}`);
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Failed to create order. Please try again.");
+            console.error(error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -121,6 +167,7 @@ export default function GameDetailsClient({ gameDetails }: { gameDetails: GameWi
                             qty={qty}
                             updateQty={updateQty}
                             onProceed={handleProceedToCheckout}
+                            isLoading={isSubmitting}
                         />
                     )}
                 </aside>
