@@ -1,4 +1,4 @@
-"use client";
+import { dashboardApiServer } from "@/services/dashboard/dashboardApiServer";
 
 import AdminToolbar from "@/components/admin/shared/AdminToolbar";
 import StatsCards from "@/components/admin/dashboard/StatsCards";
@@ -10,7 +10,10 @@ import AdminActivityFeed from "@/components/admin/dashboard/AdminActivityFeed";
 import SmartInsights from "@/components/admin/dashboard/SmartInsights";
 import QuickActions from "@/components/admin/dashboard/QuickActions";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+    const data = await dashboardApiServer.get();
+    console.log('Data of dashboard:', data);
+
     return (
         <div className="p-6 w-full space-y-4 relative">
 

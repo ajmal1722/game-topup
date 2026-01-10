@@ -11,6 +11,9 @@ export function getApiBase(fallbackOrigin?: string) {
 export const API_BASE = getApiBase();
 
 export const endpoints = {
+    dashboard: {
+        root: "/api/dashboard",
+    },
     games: {
         root: "/api/games",
         home: "/api/games/home",
