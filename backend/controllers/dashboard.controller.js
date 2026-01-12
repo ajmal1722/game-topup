@@ -76,7 +76,7 @@ export const getDashboardData = asyncHandler(async (req, res) => {
         Order.find()
             .sort({ createdAt: -1 })
             .limit(10)
-            .select("orderNumber total orderStatus createdAt user product")
+            .select("orderId game total orderStatus createdAt user product")
             .populate("user", "name email")
             .populate("product", "title price"),
 
@@ -100,6 +100,8 @@ export const getDashboardData = asyncHandler(async (req, res) => {
     // -------------------------
     // Final Response
     // -------------------------
+    console.log("Recent Orders:", recentOrders);
+    // console.log("Recent Activity:", recentActivity);
     res.json({
         orders: {
             total: totalOrders,

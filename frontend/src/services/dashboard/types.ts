@@ -64,6 +64,7 @@ export interface DashboardProduct {
  */
 export interface DashboardOrder {
     _id: string;
+    orderId: string;
     orderStatus: "pending" | "processing" | "completed";
     totalAmount: number;
     createdAt: string;

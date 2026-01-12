@@ -34,7 +34,7 @@ export default async function AdminDashboardPage() {
 
                 {/* Recent Orders (Spans 2 cols) */}
                 <div className="xl:col-span-2">
-                    <RecentOrdersTable />
+                    <RecentOrdersTable orders={data?.recentOrders} />
                 </div>
 
                 {/* Action Required (Spans 1 col) */}
