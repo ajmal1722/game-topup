@@ -1,5 +1,6 @@
 import Order from "../models/order.model.js";
 import Product from "../models/product.model.js";
+import { asyncHandler } from "../middlewares/asyncHandler.js";
 import mongoose from "mongoose";
 import { logAdminActivity } from "../utils/adminLogger.js";
 
@@ -8,95 +9,95 @@ import { logAdminActivity } from "../utils/adminLogger.js";
  * @route   POST /api/orders
  * @access  Private
  */
-export const createOrder = async (req, res) => {
-    try {
-        if (!req.user || !req.user.id) {
-            return res.status(401).json({ success: false, message: "Unauthorized" });
-        }
-
-        const { gameId, productId, qty, userInputs } = req.body;
-
-        // Basic validations
-        if (!gameId || !productId || !qty || !Array.isArray(userInputs)) {
-            return res.status(400).json({ success: false, message: "Invalid request data" });
-        }
-
-        if (qty <= 0 || !Number.isInteger(qty)) {
-            return res.status(400).json({ success: false, message: "Invalid quantity" });
-        }
-
-        // Validate user inputs early
-        for (const input of userInputs) {
-            if (!input.label || typeof input.value === "undefined") {
-                return res.status(400).json({
-                    success: false,
-                    message: "Each input must contain label and value"
-                });
-            }
-        }
-
-        const sanitizedInputs = userInputs.map(input => ({
-            label: input.label,
-            value: input.value
-        }));
-
-        // Now hit the DB
-        const product = await Product.findOne({ _id: productId, gameId });
-        if (!product) {
-            return res.status(404).json({ success: false, message: "Product not found for this game" });
-        }
-
-        const unitPrice = product.discountedPrice ?? product.price;
-        const amount = unitPrice * qty;
-
-        let order;
-        for (let i = 0; i < 3; i++) {
-            try {
-                const timestamp = Date.now().toString().slice(-6);
-                const random = Math.random().toString(36).substring(2, 5).toUpperCase();
-                const orderId = `ORD-${timestamp}-${random}`;
-
-                order = await Order.create({
-                    orderId,
-                    user: req.user.id,
-                    game: gameId,
-                    product: productId,
-                    amount,
-                    userInputs: sanitizedInputs,
-                    productSnapshot: {
-                        name: product.name,
-                        price: product.price,
-                        discountedPrice: product.discountedPrice,
-                        deliveryTime: product.deliveryTime || "24-48 Hours",
-                        qty: qty,
-                        totalAmount: amount
-                    },
-                    tracking: [{
-                        status: "pending",
-                        message: "Order placed successfully. Awaiting payment/verification."
-                    }]
-                });
-                break;
-            } catch (err) {
-                if (err.code !== 11000) throw err;
-            }
-        }
-
-        if (!order) {
-            return res.status(500).json({ success: false, message: "Failed to generate unique order ID" });
-        }
-
-        res.status(201).json({
-            success: true,
-            data: order,
-            message: "Order created successfully"
-        });
-
-    } catch (error) {
-        console.error("Create Order Error:", error);
-        res.status(500).json({ success: false, message: error.message });
+export const createOrder = asyncHandler(async (req, res) => {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-};
+
+    const { gameId, productId, qty, userInputs } = req.body;
+
+    // Basic validations
+    if (!gameId || !productId || !qty || !Array.isArray(userInputs)) {
+        return res.status(400).json({ success: false, message: "Invalid request data" });
+    }
+
+    if (qty <= 0 || !Number.isInteger(qty)) {
+        return res.status(400).json({ success: false, message: "Invalid quantity" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(gameId) || !mongoose.Types.ObjectId.isValid(productId)) {
+        return res.status(400).json({ success: false, message: "Invalid IDs" });
+    }
+
+    // Validate user inputs early
+    for (const input of userInputs) {
+        if (!input.label || typeof input.value === "undefined") {
+            return res.status(400).json({
+                success: false,
+                message: "Each input must contain label and value"
+            });
+        }
+    }
+
+    const sanitizedInputs = userInputs.map(input => ({
+        label: input.label,
+        value: input.value
+    }));
+
+    // Now hit the DB
+    const product = await Product.findOne({ _id: productId, gameId }).lean();
+    if (!product) {
+        return res.status(404).json({ success: false, message: "Product not found for this game" });
+    }
+
+    const unitPrice = product.discountedPrice ?? product.price;
+    const amount = unitPrice * qty;
+
+    let order;
+    for (let i = 0; i < 3; i++) {
+        try {
+            const timestamp = Date.now().toString().slice(-6);
+            const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+            const orderId = `ORD-${timestamp}-${random}`;
+
+            order = await Order.create({
+                orderId,
+                user: req.user.id,
+                game: gameId,
+                product: productId,
+                amount,
+                quantity: qty,
+                unitPrice,
+                userInputs: sanitizedInputs,
+                productSnapshot: {
+                    name: product.name,
+                    price: product.price,
+                    discountedPrice: product.discountedPrice,
+                    deliveryTime: product.deliveryTime || "24-48 Hours",
+                    qty: qty,
+                    totalAmount: amount
+                },
+                tracking: [{
+                    status: "pending",
+                    message: "Order placed successfully. Awaiting payment/verification."
+                }]
+            });
+            break;
+        } catch (err) {
+            if (err.code !== 11000) throw err;
+        }
+    }
+
+    if (!order) {
+        return res.status(500).json({ success: false, message: "Failed to generate unique order ID" });
+    }
+
+    res.status(201).json({
+        success: true,
+        data: order,
+        message: "Order created successfully"
+    });
+});
 
 /**
  * @desc    Get user's orders

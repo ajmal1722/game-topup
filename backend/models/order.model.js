@@ -6,6 +6,7 @@ const orderSchema = new mongoose.Schema(
             type: String,
             unique: true,
             required: true,
+            index: true,
         },
 
         user: {
@@ -30,6 +31,18 @@ const orderSchema = new mongoose.Schema(
         amount: {
             type: Number,
             required: true,
+            min: 0,
+        },
+
+        quantity: {
+            type: Number,
+            required: true,
+            min: 1
+        },
+        unitPrice: {
+            type: Number,
+            required: true,
+            min: 0
         },
 
         // Payment details
@@ -46,29 +59,25 @@ const orderSchema = new mongoose.Schema(
         },
 
         paymentInfo: {
-            transactionId: { type: String },
-            paymentGatewayResponse: { type: Object }, // optional raw response
+            transactionId: { type: String, index: true },
+            paymentGatewayResponse: { type: mongoose.Schema.Types.Mixed }, // optional raw response
         },
 
         // Required fields collected from UI (like email, playerId, server)
-        userInputs: [
-            {
-                label: { type: String, required: true }, // "Player ID"
-                value: { type: mongoose.Schema.Types.Mixed, required: true },
-            },
-        ],
+        userInputs: {
+            type: [
+                {
+                    label: { type: String, required: true, trim: true },
+                    value: { type: mongoose.Schema.Types.Mixed, required: true }
+                }
+            ],
+            default: []
+        },
 
         // Admin workflow
         orderStatus: {
             type: String,
-            enum: [
-                "pending",        // (order created but not paid)
-                "paid",           // (payment success)
-                "processing",     // (admin working)
-                "completed",      // (top-up done)
-                "cancelled",      // (admin/user cancelled)
-                "failed",         // (admin failed to top-up)
-            ],
+            enum: ["pending", "paid", "processing", "completed", "cancelled", "failed"],
             default: "pending",
         },
 
