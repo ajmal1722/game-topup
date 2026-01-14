@@ -39,7 +39,7 @@ export default async function AdminDashboardPage() {
 
                 {/* Action Required (Spans 1 col) */}
                 <div className="xl:col-span-1 h-full">
-                    <ActionRequiredPanel />
+                    <ActionRequiredPanel actions={data?.actionRequired} />
                 </div>
             </div>
 

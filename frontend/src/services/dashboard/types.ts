@@ -64,13 +64,15 @@ export interface DashboardGame {
     name: string;
 }
 
+export type OrderStatus = "pending" | "processing" | "completed" | "failed";
+
 /**
  * Recent order returned by dashboard
  */
 export interface DashboardOrder {
     _id: string;
     orderId: string;
-    orderStatus: "pending" | "processing" | "completed";
+    orderStatus: OrderStatus;
     amount: number;
     createdAt: string;
     game: DashboardGame;
@@ -98,12 +100,22 @@ export interface DashboardActivity {
     admin: DashboardAdmin;
 }
 
+export interface DashboardActionRequired {
+    ordersToProcess: number;
+    stuckOrders: number;
+    pendingPayments: number;
+    failedPaymentsToday: number;
+    unverifiedUsers: number;
+    blockedUsers: number;
+}
+
 // ===== Main Response Type =====
 
 export interface DashboardResponse {
     orders: DashboardOrdersStats;
     users: DashboardUsersStats;
     revenue: DashboardRevenueStats;
+    actionRequired: DashboardActionRequired;
 
     recentOrders: DashboardOrder[];
     recentActivity: DashboardActivity[];
