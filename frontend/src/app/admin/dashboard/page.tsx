@@ -27,7 +27,7 @@ export default async function AdminDashboardPage() {
             <DashboardCharts />
 
             {/* 3. System Health Snapshot */}
-            <SystemHealthPanel />
+            <SystemHealthPanel health={data?.systemHealth} />
 
             {/* 4. Panels Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
