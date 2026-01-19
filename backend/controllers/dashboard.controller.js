@@ -3,6 +3,7 @@ import Order from '../models/order.model.js';
 import User from '../models/user.model.js';
 import Payment from '../models/payment.model.js';
 import AdminActivityLog from '../models/adminLog.model.js';
+import mongoose from "mongoose";
 
 export const getDashboardData = asyncHandler(async (req, res) => {
 
@@ -129,6 +130,32 @@ export const getDashboardData = asyncHandler(async (req, res) => {
     const todayRevenue = revenueData.today?.[0]?.value || 0;
     const weekRevenue = revenueData.week?.[0]?.value || 0;
 
+    // ---------------- System Health ----------------
+    let databaseStatus = "Disconnected";
+
+    try {
+        await mongoose.connection.db.admin().ping();
+        databaseStatus = "Connected";
+    } catch { }
+
+    const lastSuccessfulPayment = await Payment.findOne({ status: "success" })
+        .sort({ updatedAt: -1 })
+        .select("updatedAt");
+
+    let paymentGatewayStatus = "Healthy";
+
+    // If no success payment ever, we mark as Offline (or maybe they just started)
+    if (!lastSuccessfulPayment) {
+        paymentGatewayStatus = "Offline";
+    } else {
+        const minutesAgo =
+            (Date.now() - lastSuccessfulPayment.updatedAt.getTime()) / 60000;
+
+        if (minutesAgo > 60 || failedPaymentsToday > 10) {
+            paymentGatewayStatus = "Degraded";
+        }
+    }
+
     // -------------------------
     // Final Response
     // -------------------------
@@ -160,6 +187,14 @@ export const getDashboardData = asyncHandler(async (req, res) => {
             pendingPayments,
             unverifiedUsers,
             failedPaymentsToday
+        },
+
+        // 🩺 System Health Snapshot
+        systemHealth: {
+            server: "Online",
+            database: databaseStatus,
+            paymentGateway: paymentGatewayStatus,
+            emailService: "Unknown"
         }
     });
 });

@@ -111,6 +111,13 @@ export interface DashboardActionRequired {
     blockedUsers: number;
 }
 
+export interface DashboardSystemHealth {
+    server: string;
+    database: string;
+    paymentGateway: string;
+    emailService: string;
+}
+
 // ===== Main Response Type =====
 
 export interface DashboardResponse {
@@ -118,6 +125,7 @@ export interface DashboardResponse {
     users: DashboardUsersStats;
     revenue: DashboardRevenueStats;
     actionRequired: DashboardActionRequired;
+    systemHealth: DashboardSystemHealth;
 
     recentOrders: DashboardOrder[];
     recentActivity: DashboardActivity[];
