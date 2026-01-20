@@ -19,7 +19,7 @@ const app = express();
 
 // Configure CORS options
 const corsOptions = {
-    origin: ['http://localhost:3000', 'http://rukntravels.com', 'https://rukntravels.com', 'https://www.rukntravels.com'],
+    origin: ['http://localhost:3000', 'http://rukntravels.com', 'https://rukntravels.com', 'https://www.rukntravels.com', 'https://game-topup-fe5y.vercel.app', 'https://game-topup-fe5y.vercel.app/'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
 };
