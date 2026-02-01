@@ -39,6 +39,7 @@ export const sendPasswordResetEmail = async (email, token) => {
         subject: "Password Reset Request",
         html: htmlContent,
     });
+    
 
     // Log preview URL for development
     console.log("📧 Email sent! Preview URL:", nodemailer.getTestMessageUrl(info));
