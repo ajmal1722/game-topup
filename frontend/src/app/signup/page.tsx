@@ -29,8 +29,8 @@ export default function SignupPage() {
                 throw new Error("Please fix the validation errors");
             }
             await register(name, email, password);
-            toast.success("Account created successfully");
-            router.push("/");
+            toast.success("Account created! Please check your email to verify.");
+            router.push(`/check-email?email=${encodeURIComponent(email)}`);
         } catch (err: unknown) {
             let message = "Signup failed";
             if (err instanceof Error) message = err.message;

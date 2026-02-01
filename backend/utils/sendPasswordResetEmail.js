@@ -5,28 +5,43 @@ dotenv.config();
 export const sendPasswordResetEmail = async (email, token) => {
     const url = `${process.env.CLIENT_URL}/reset-password/${token}`;
 
+    // Create transporter for local testing (Ethereal)
+    const testAccount = await nodemailer.createTestAccount();
+
     const transporter = nodemailer.createTransport({
-        service: "gmail",
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false,
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
-        }
+            user: testAccount.user,
+            pass: testAccount.pass,
+        },
     });
 
-    const message = `
-        You requested a password reset. 
-        
-        Click the link below to reset your password:
-        ${url}
-
-        If you did not request this, please ignore this email.
-        This link expires in 15 minutes.
+    const htmlContent = `
+        <h2>Password Reset Request</h2>
+        <p>You requested a password reset for your Game Topup account.</p>
+        <p>
+            <a href="${url}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                Reset Password
+            </a>
+        </p>
+        <p>Or copy this link: ${url}</p>
+        <p style="color: #666; font-size: 12px;">
+            This link expires in 15 minutes.<br>
+            If you did not request this, please ignore this email.
+        </p>
     `;
 
-    await transporter.sendMail({
-        from: process.env.SMTP_USER,
+    const info = await transporter.sendMail({
+        from: '"Game Topup" <noreply@gametopup.com>',
         to: email,
         subject: "Password Reset Request",
-        text: message,
+        html: htmlContent,
     });
+
+    // Log preview URL for development
+    console.log("📧 Email sent! Preview URL:", nodemailer.getTestMessageUrl(info));
+
+    return info;
 };

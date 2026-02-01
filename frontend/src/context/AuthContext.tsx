@@ -51,8 +51,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const register = async (name: string, email: string, password: string) => {
         await authApi.registerUser({ name, email, password });
-        const me = await authApi.getProfile();
-        setUser(me);
+        // Don't try to get profile - user needs to verify email first
+        // User will login after email verification
     };
 
     const logout = async () => {
